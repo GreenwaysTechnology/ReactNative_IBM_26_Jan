@@ -796,6 +796,7 @@ let product = {
 }
 console.log(product.id, product.category.name)
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+				&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 				Built in Objects
 
 Category of Objects
@@ -813,3 +814,341 @@ etc...
 Browser specific  object
 
 Window ,Document, Form, History etc...
+
+
+..................................................................................
+				Arrays
+...................................................................................
+
+Arrays core data structure
+Array can hold any value
+Array is object which lot of methods
+
+let list = ['apple', 'orange', 'jackfruit']
+//iterate array : for loop, for..each,filter,map,reduce etc...
+
+list.forEach(item => {
+    console.log(item)
+})
+//array of objects
+
+let todos = [
+    { id: 1, status: 'done', title: 'learn js' },
+    { id: 2, status: 'pending', title: 'learn react' },
+    { id: 3, status: 'pending', title: 'learn react native' }
+]
+todos.forEach(todo => {
+    console.log(todo.id, todo.status, todo.title)
+})
+....................................................................................	
+			Object De structuring
+...................................................................................
+How to de structure object properties when it is passed as arg
+
+// function printEmployee(employee) {
+//     console.log(`Id ${employee.id}`)
+//     console.log(`name ${employee.name}`)
+//     console.log(`City ${employee.address.city}`)
+// }
+
+//with destructuring
+// function printEmployee(employee) {
+//     const { id, name, address: { city } } = employee
+//     console.log(`Id ${id}`)
+//     console.log(`name ${name}`)
+//     console.log(`City ${city}`)
+// }
+function printEmployee({ id, name, address: { city } }) {
+    console.log(`Id ${id}`)
+    console.log(`name ${name}`)
+    console.log(`City ${city}`)
+}
+
+printEmployee({ id: 1, name: 'Subramanian', address: { city: 'Coimbatore' } })
+
+..................................................................................
+			Return object and Destructuring
+..................................................................................
+// function getStock() {
+//     return {
+//         id: 1,
+//         symbol: 'google',
+//         qty: 100,
+//         price: 1000
+//     }
+// }
+// console.log(getStock())
+
+// function getStock(id = 0, symbol = 'Foo', qty = 0, price = 0) {
+//     return {
+//         id: id,
+//         symbol: symbol,
+//         qty: qty,
+//         price: price
+//     }
+// }
+// console.log(getStock(1, 'google', 100, 1000))
+// console.log(getStock())
+
+// function getStock(id = 0, symbol = 'Foo', qty = 0, price = 0) {
+//     //destructuring
+//     return {
+//         //left;right if same,make it
+//         id,
+//         symbol,
+//         qty,
+//         price
+//     }
+// }
+// const getStock = (id = 0, symbol = 'Foo', qty = 0, price = 0) => {
+//     return {
+//         id,
+//         symbol,
+//         qty,
+//         price
+//     }
+// }
+const getStock = (id = 0, symbol = 'Foo', qty = 0, price = 0) => ({
+    id,
+    symbol,
+    qty,
+    price
+})
+
+console.log(getStock(1, 'google', 100, 1000))
+console.log(getStock())
+..........................................................................................................................................................................................
+							 Async programming 
+.......................................................................................................................................................................................
+
+Async programming which does not block current thread ,work is done in Kernal parts.
+Results are returned from the Kernal using event driven arch.
+
+How to implement async programming?
+
+Req:
+1.High level non blocking apis provided by js language.
+        -timers,ajax,web socket....
+2.Listener function to  handle async results which is called as callbacks.
+3.Callbacks are implemented using Higher order Function(function as parameter)
+
+
+Styles of writing async programming:
+
+1.callbacks pattern
+2.Promise Pattern
+3.Promise with async and await
+4.Reactive Programming via rxjs...
+
+
+function blockMe(message) {
+    console.log(message)
+}
+function sayHello(callback) {
+    setTimeout(callback, 5000)
+}
+function main() {
+    blockMe('start')
+    sayHello(function () {
+        console.log('hello')
+    })
+    blockMe('end')
+}
+main()
+
+Arrow Version:
+function blockMe(message) {
+    console.log(message)
+}
+function sayHello(callback) {
+    setTimeout(callback, 5000)
+}
+function main() {
+    blockMe('start')
+    sayHello(() => {
+        console.log('hello')
+    })
+    blockMe('end')
+}
+main()
+
+..................
+
+Callback with data:
+function blockMe(message) {
+    console.log(message)
+}
+function sayHello(abc) {
+    setTimeout(abc, 5000,'Hello')
+}
+function main() {
+    blockMe('start')
+    sayHello((message) => {
+        console.log(message)
+    })
+    blockMe('end')
+}
+main()
+.......................
+
+callback with realtime example.
+
+
+//resolve=success,reject=failure
+const login = (userName, password, resolve, reject) => {
+    if (userName === 'admin' && password === 'admin') {
+        setTimeout(resolve, 1000, 'login success')
+    } else {
+        setTimeout(reject, 1000, 'login is failed')
+    }
+}
+function main() {
+    login('admin', 'admin', (status) => {
+        console.log(status)
+    }, (err) => {
+        console.log(err)
+    })
+
+    login('xx', 'yy', (status) => {
+        console.log(status)
+    }, (err) => {
+        console.log(err)
+    })
+
+}
+main()
+...................................................................................
+				callback chaining
+..................................................................................
+
+The output one callback will be input for another callback.
+
+in sequential  code
+
+const res1 = api1()
+const res2 =api2(res1)
+
+in Async code ? callback chaining.
+
+const getUser = (resolve, reject) => {
+    console.log('getUser is called')
+    let user = { name: 'admin' }
+    //    user = null
+    if (user) {
+        setTimeout(resolve, 1000, user)
+    } else {
+        setTimeout(reject, 1000, 'User not found')
+    }
+}
+const login = (user, resolve, reject) => {
+    console.log('login is called')
+    if (user.name === 'admin') {
+        setTimeout(resolve, 1000, 'login is success')
+    } else {
+        setTimeout(reject, 1000, 'login is failed')
+    }
+}
+const showdashbaord = (status, resolve, reject) => {
+    console.log('showdashbaord is called')
+    if (status === 'login is success') {
+        setTimeout(resolve, 1000, 'welcome to dashboard')
+    } else {
+        setTimeout(reject, 1000, 'welcome to guest')
+    }
+}
+
+function main() {
+    getUser(user => {
+        login(user, status => {
+            showdashbaord(status, adminPage => {
+                console.log(adminPage)
+            }, errPage => {
+                console.log(errPage)
+            })
+        }, err => {
+            console.log(err)
+        })
+    }, err => {
+        console.log(err)
+    })
+}
+main()
+
+Callback Hell:
+..............
+getUser(user => {
+    login(user, status => {
+        console.log(status)
+    }, err => {
+        console.log(err)
+    })
+}, err => {
+    console.log(err)
+})
+
+
+fs.readdir(source, function (err, files) {
+  if (err) {
+    console.log('Error finding files: ' + err)
+  } else {
+    files.forEach(function (filename, fileIndex) {
+      console.log(filename)
+      gm(source + filename).size(function (err, values) {
+        if (err) {
+          console.log('Error identifying file size: ' + err)
+        } else {
+          console.log(filename + ' : ' + values)
+          aspect = (values.width / values.height)
+          widths.forEach(function (width, widthIndex) {
+            height = Math.round(width / aspect)
+            console.log('resizing ' + filename + 'to ' + height + 'x' + height)
+            this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
+              if (err) console.log('Error writing file: ' + err)
+            })
+          }.bind(this))
+        }
+      })
+    })
+  }
+
+In the above code:
+
+Are you able to understand code?
+Are you able to debug code easily?
+Are you able to scale code?
+
+No!
+ This is called "Callback Hell".
+
+How to avoid callback hell or how to write clean async code? how to write simple async programming without callback hell?
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+										Promises
+......................................................................................................................................................................................................................................
+Promises:
+.........
+Promise is design pattern which hides complexity of callback patterns
+
+Since Promise is design pattern, many people have implemented Promise design pattern.
+
+1.JQuery -first promise implementation
+2.many libs and frameworks
+
+In order standardize , ECMA committee decided to include Promise Design pattern at language level .(ES 6) 2012 E6 Committee introduced promise design pattern  as  "Promise" Object  in JavaScript.
+
+.....................................................................................
+			  Promise Implementation
+.....................................................................................
+
+Features of Promise Object:
+
+1.Promise by default is Async. Which implements timer api with 0 ms .
+2.Promise can be used with any async callback based  implementations.
+
+Objective:
+
+ To remove callbacks in async/non blocking code. write cleaner async programming.
+ To remove complex callback chaining code.
+
+Difference between callbacks and promises:
+
+Essentially, a promise is a returned object to which you attach callbacks, instead of passing callbacks into a function.
