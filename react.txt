@@ -508,3 +508,308 @@ class Heading extends React.Component {
 
 
 createRoot(document.getElementById('root')).render(<Heading />)
+....................................................................................
+							Exploring JSX
+.....................................................................................
+
+JS-JavaScript
+X -  XML
+
+	Since HTML parser is weak, but when y write react code, we need consistent code generation.
+
+So that react team, developed compiler follows basic xml rules.
+
+Basic XML  rules:
+
+1.every opened element must be closed
+  <h1>Hello</h1>
+  <Welcome></Welcome>
+ some elements may not have closing tag
+  <img /> : image element has no child elements : self closing. 
+
+import { createRoot } from "react-dom/client"
+
+const Heading = ()=>{
+    return <h1>Hello
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+[plugin:vite:react-babel] G:\IBM\2024\Nov\ReactiveNative-B1\myreact-app\src\main.jsx: Unterminated JSX contents. (8:62)
+
+   6 |
+   7 |
+>  8 | createRoot(document.getElementById('root')).render(<Heading />)
+
+
+2. In xml you must have one single root element.
+  all elements must be organized under single root element.
+
+   <h1>Welcome to IBM</h1>
+   <p>Hello</p>
+
+In html what can be root element
+ <div>,<span>,all html 5 layout elements header,footer,section,aside...
+
+import { createRoot } from "react-dom/client"
+
+const Heading = ()=>{
+    return <h1>Hello</h1>
+           <p>This is element</p>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+Solution:
+import { createRoot } from "react-dom/client"
+
+const Heading = () => {
+    return <div><h1>Hello</h1>
+        <p>This is element</p>
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+
+3.Self closing:
+import { createRoot } from "react-dom/client"
+import logo from './assets/react.svg';
+
+const Heading = () => {
+    return <div>
+        <img src={logo} />
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+4.Component Name must be Pascal Case
+  It has to start with capital letter
+  It should be Noun
+
+import { createRoot } from "react-dom/client"
+import logo from './assets/react.svg';
+
+const heading = () => {
+    return <div>
+        <img src={logo} />
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<heading />)
+
+
+hook.js:608 Warning: The tag <heading> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter
+..........................................................................................................................................................................................................................................
+			  				  Fragments
+....................................................................................................................
+
+There might be use case where i don't want root element, but without root element compiler gives error.
+Can we skip the root element without compile time error.
+
+ Yes
+
+Fragments:
+  
+   Fragments are invisible root element , just only compilation purpose
+
+
+Syntax:
+
+ 1.<React.Fragment>
+ </React.Fragement>
+2.<Fragment>
+ </Fragement>
+3.<>
+ </>
+import ReactDOM from 'react-dom/client';
+// import React, { Fragment } from 'react';
+
+// const Welcome = () => {
+//     return <React.Fragment>
+//         <h1>Site Heading</h1>
+//         <p>This is react</p>
+//     </React.Fragment>
+// }
+
+// const Welcome = () => {
+//     return <Fragment>
+//         <h1>Site Heading</h1>
+//         <p>This is react</p>
+//     </Fragment>
+// }
+
+const Welcome = () => {
+    return <>
+        <h1>Site Heading</h1>
+        <p>This is react</p>
+    </>
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(<Welcome />)
+........................................................................................................................................................................................................................
+								 Data binding
+....................................................................................................................
+
+Create  new project:
+
+>npm create vite@latest data-binding
+
+As of now we have seen only how to create static UI - (only HTML)
+
+How to represent data?
+->primitives - string,numbers,boolean
+->objects - object,arrays
+
+How to bind data?
+  {variable} {expression}
+ 
+  {a} {fun()} {10*2} {isHidden ? 'Show':'Hide'} 
+
+
+Simple Databinding:
+
+const User = () => {
+    //variables
+    const id = 1
+    const userName = 'Subramanian Murugan'
+    const email = 'sasubramanian_m@hotmail.com'
+    const address = {
+        city: 'Coimbatore'
+    }
+    const status = true
+
+    return <div>
+        <h1>User info</h1>
+        <h3>Id : {id}</h3>
+        <h3>Name : {userName}</h3>
+        <h4>Email : {email}</h4>
+        <h4>City : {address.city}</h4>
+        <h4>Status : {status ? "Available" : "Not Available"}</h4>
+    </div>
+
+}
+export { User }
+
+If you look at the code above, data is declared within component is tightly coupled.
+
+When you think about component you have to about reusability.
+
+What if i want to show different user information? How to create component in reusable manner?
+
+     ->Properties
+..............................................................................................
+			Data binding patterns
+
+1.props pattern /property pattern
+2.state pattern
+
+How to create reusable component?
+
+ Component must be parametrized or configurable....
+
+You know very well component is function, just js function, when you think about function, you can pass parameter....
+
+
+Use case: invoke function and pass data
+........................................
+
+src/User.jsx
+
+const User = (id,userName,email,address,status) => {
+    return <div>
+        <h1>User info</h1>
+        <h3>Id : {id}</h3>
+        <h3>Name : {userName}</h3>
+        <h4>Email : {email}</h4>
+        <h4>City : {address.city}</h4>
+        <h4>Status : {status ? "Available" : "Not Available"}</h4>
+    </div>
+}
+export { User }
+
+src/App.jsx
+import { User } from "./users/User";
+
+function App() {
+    return <>
+        {User(1, 'Subramanian Murugan', 'subu@gmail.com', { city: 'Coimbatore' }, true)}
+    </>
+}
+
+export default App;
+.................................................................................
+			Passing props and receiving props with declarative pattern
+................................................................................
+
+src/users/User.jsx
+
+//props is not keyword just variable convention
+//props hold object , object has all properties what ever we passed from parent
+const User = (props) => {
+    console.log(props)
+    return <div>
+        <h3>Id : {props.id}</h3>
+        <h3>Name : {props.userName}</h3>
+        <h4>Email : {props.email}</h4>
+        <h4>City : {props.address.city}</h4>
+        <h4>Status : {props.status ? "Available" : "Not Available"}</h4>
+    </div>
+}
+export { User }
+
+src/App.jsx
+import { User } from "./users/User";
+
+// function App() {
+//     return <>
+//         {User(1, 'Subramanian Murugan', 'subu@gmail.com', { city: 'Coimbatore' }, true)}
+//         {User(2, 'Murugan', 'murugan@gmail.com', { city: 'Chennai' }, false)}
+//     </>
+// }
+
+function App() {
+    return <>
+           <User id={1} email='subu@gmail.com' userName='Subramanian Murugan'  address={{ city: 'Coimbatore' }} status={true} />
+           <User id={1} email='subu@gmail.com' userName='Subramanian Murugan'  address={{ city: 'Coimbatore' }} status={true} />
+           <User id={1} email='subu@gmail.com' userName='Subramanian Murugan'  address={{ city: 'Coimbatore' }} status={true} />
+           <User id={1} email='subu@gmail.com' userName='Subramanian Murugan'  address={{ city: 'Coimbatore' }} status={true} />
+    </>
+
+}
+export default App;
+................................................................................
+		Code Refactoring -  Object DE structuring and props
+...............................................................................
+
+Destructuring within function:
+const User = (props) => {
+    const { id, userName, email, address: { city }, status } = props
+    return <div>
+        <h3>Id : {id}</h3>
+        <h3>Name : {userName}</h3>
+        <h4>Email : {email}</h4>
+        <h4>City : {city}</h4>
+        <h4>Status : {status ? "Available" : "Not Available"}</h4>
+    </div>
+}
+export { User }
+
+Destructuring with function args
+const User = ({ id, userName, email, address: { city }, status }) => <div>
+    <h3>Id : {id}</h3>
+    <h3>Name : {userName}</h3>
+    <h4>Email : {email}</h4>
+    <h4>City : {city}</h4>
+    <h4>Status : {status ? "Available" : "Not Available"}</h4>
+</div>
+
+export { User }
