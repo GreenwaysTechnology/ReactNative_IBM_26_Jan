@@ -1,0 +1,510 @@
+		 React/React.js
+.....................................................................................
+
+What is react?
+ 	A JavaScript library for building user interfaces.
+
+User interfaces:
+
+1.Desktop
+2.Browser based web 
+3.mobile app
+
+React was created for building web based interface, later react started in mobile development
+
+React - browser
+React Native - mobile
+
+
+....................................................................................
+			DOM,VDOM (V.TREE)
+.....................................................................................
+
+What is DOM?
+   DOM is specification  released by W3c organization order to build web apps for browsers.
+
+in order to understand DOM fully , we need to understand HTML very deeply.
+
+HTML:
+
+1.HTML IS PL? - YES
+2.HTML Is compiled -YES
+3.HTML is excuted-YES
+
+Hello.java --->compile--->Hello.class--->run----JVM(Runtime) executes code.
+
+index.html -source code
+
+<html>
+<head></head>
+<title><title>
+<body>
+  <div>
+     <h1>Welcome</h1>
+  </div>
+</body>
+</html>
+-------------------Browser
+loader---LOAD Code into browser
+ |
+  from file: or http:
+|
+Parser :
+   Parser is special compiler which converts source code into lexical tree(string tree)
+|
+body
+  div
+     h1
+        Welcome 
+     h1
+  div
+body
+|
+|
+Complier-Compilation : Convert this into assembly
+|
+body -load xxx
+  div
+     h1
+        Welcome 
+     h1
+  div
+body
+
+.....................................................................................
+				Runtime 
+.....................................................................................
+HTML Execution engine : Request Os ,to allocate memory :Runtime
+
+
+-LinkedList - c language
+
+body -Node
+  div -Node
+     h1 -Node
+        Welcome -Node
+     h1
+  div
+body
+|
+ Linking the Nodes: Tree
+body  -Node
+  |
+  div -Node
+    |
+     h1 -Node
+      |
+        Welcome -Node
+        |
+     h1
+  div
+|
+ Layout/Paint Engine: will convert nodes into pxs : final output
+....................................................................................
+..............................................................................................
+Static web pages: HTMLs are displayed into browser.
+..............................................................................................
+In 1996,Netscap communication, Started an RND project called "How to manipulate the tree"
+
+Tree is written in c language, then we need another c program to communicate.
+
+But NETSCAP decided not to use C pl.
+
+Netscap wanted to put java like implementation inside browser to manipulate "Tree".
+
+that is birth of javascript.
+
+How to access nodes from javascript engine?
+  
+One spec was published ,As per that spec
+ "Document Object Model"
+    -How to represent document(elements/nodes) in object oriented way.->DOM
+
+ "Documents can be represented as Objects" : Object oriented Document Programming.
+
+............................................................................................
+
+How dom works?
+
+index.html           Browser runtime(C program)         Javascript Engine
+<h1>Hello</h1>       h1-Node                           h1- Object
+			Hello-Node			 Hello Object Property
+
+
+
+                 Every Html ELEMENT Inside Browser is "C Program"
+
+	       Every Html ELEMENT Inside JavaScript engine is "Object"
+
+
+javascript developer ---->uses api --->to communicate Object---->js engine---->browser engine.	*************************************************************************************
+Who and when "H1" object is created?
+
+if you want to create object?
+
+ class/ function
+
+function Employee(){}  let emp = new Employee()
+
+
+<h1> => function HTMLHeadingElement(){} => let h =new HTMLHeadingElement() ?
+
+Note: For html elements, we cant create object directly, rather than JS Engine will create objects , return references to the developer to access.
+ How via factory Objects: object helps to get other documents
+
+
+Factory Object : HTML Document =>body
+
+document.getElementById();
+   |
+Implicit object reference variable which points HTMLDocument OBject.
+...................................................................................
+What is our objective here? DOM Programming?
+Enter into DOM programming:
+
+1.write dom programming using javascript language.
+
+<body>
+  |
+HTMLDocument : body : factory Object
+
+
+Document apis:
+
+Finding HTML Elements
+
+HTMLElement document.getElementById(id)
+      Find an element by element id
+HTMLElement Document document.getElementsByTagName(name)
+	Find elements by tag name
+HTMLElement document.getElementsByClassName(name)
+	Find elements by class name
+
+HTMLElement document.querySelectory(selector) 
+      find element/elements by selector
+
+
+Changing HTML Elements : update existing element
+......................
+element.innerHTML =  new html content	Change the inner HTML of an element
+element.attribute = new value	Change the attribute value of an HTML element
+element.style.property = new style	Change the style of an HTML element
+Method	Description
+element.setAttribute(attribute, value)	Change the attribute value of an HTML element
+
+Adding and Deleting Elements
+document.createElement(element)	Create an HTML element
+document.removeChild(element)	Remove an HTML element
+document.appendChild(element)	Add an HTML element
+document.replaceChild(new, old)	Replace an HTML element
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									   React as Dom lib
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+React project setup:
+.................................
+
+in order to create project or mange project, build project, deploy project -  you need build tools
+
+In java we use maven or Gradle.
+
+In JavaScript we use node based build tool called "npm or npx". This tool is available only along with node.
+if you want to use npm or npx you must have installed node.js
+
+React teams offers tool set to create react project.
+
+create-react-app:
+ This old tool to create react application, almost this tool has been moved into maintenance .
+
+vite:
+ Now a days vite based tools are becoming very popular.
+
+npm:
+ node package manager
+
+npm create vite@latest my-app
+
+Need to install the following packages:
+create-vite@6.5.0
+Ok to proceed? (y) y
+
+
+> npx
+> create-vite
+
+|
+o  Project name:
+|  myreactapp
+|
+o  Select a framework:
+|  React
+|
+o  Select a variant:
+|  JavaScript
+|
+o  Scaffolding project in G:\IBM\2025\May\ReactNative\myreactapp...
+|
+—  Done. Now run:
+
+  cd myreactapp
+  npm install
+  npm run dev
+
+...................................................................................
+			Exploring Project Structure
+...................................................................................
+
+package.json
+{
+  "name": "myreact-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.11.0",
+    "vite": "^5.4.10"
+  }
+}
+index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+src/main.jsx : root File
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+									   DOM programming using plain js
+..........................................................................................................................................................................................................................................
+function createNode() {
+    const Heading = document.createElement('h1')
+    Heading.innerHTML = 'Hello React!'
+    console.dir(Heading)
+    //get the element where you want to insert
+    const rootElement = document.getElementById('root')
+    rootElement.appendChild(Heading)
+}
+createNode()
+.....................................................................................
+			DOM Programming using React.js
+.....................................................................................
+
+// import ReactDOM from 'react-dom/client'
+import { createRoot } from "react-dom/client"
+
+//declare DOM 
+const Heading = <h1>Hello React! How are you?</h1>
+
+// const rootElement = document.getElementById('root')
+// ReactDOM.createRoot(rootElement).render(Heading)
+
+// ReactDOM.createRoot(document.getElementById('root')).render(Heading)
+createRoot(document.getElementById('root')).render(Heading)
+
+.......................................................................................................................................................................................................................................
+					JSX - java script and XML - language to create User interfaces
+......................................................................................................................................................................................................................................
+
+React uses declarative Dom programing using a mini language invented by Facebook : JSX
+
+JSX : - JavaScript xml
+
+ 1.PL language built by face book to write user interfaces.
+ 2.JSX is collection of html markup and JavaScript.
+ 3.JSX is DSL and declarative.
+ 4.Every device has its own JSX language syntax.
+ 5.Browsers JSX can't be used for building mobile application.
+
+
+Since JSX  is a language cant be executed on browser /mobile directly.
+..................................................................................
+JSX compilation model:
+
+                   layout.js / layout.jsx
+		       |
+		    compiler - babel.js 
+			|
+		    plain js code
+			|-----------------------Dev cycle
+	----------------------------------------- -- Execution cycles Starts
+  Runtime : React Engine  compiled code feed into react engine
+			|
+		     Execute compiled js code : function calls
+			|
+	     create virtual Object tree (in browser V-dom)
+		        |
+		     Render Engine ; will convert react object tree into js dom object tree
+			|
+		   Flush the tree into target
+			|
+	--------------------------------------------
+        |      |
+     Browser  Mobile
+
+Since jsx  is a language cant be executed on browser /mobile directly.
+
+JSX is used to create dom elements.
+
+Every DOM element is object.
+
+.........................................................................................................................................................................................................................................
+				Component
+.................................................................................
+
+What is Component ?
+  Component is Object , Coined by MS in 1989.
+
+According to ms, Component is object which has state(data),behavior(methods) + User interface(Visual).
+ eg:Button,TextBox,Grid,Menu,MenuBar,Layout,Table.....
+
+Component === Widget ==== Object ==== DOM
+
+Like Object tree(DOM Tree), In React we can create "Component" Tree.
+
+
+      Node===DOM Object====Component
+       h1   --->  HTML Heading--->   Heading
+
+"React apps are made out of components. A Component is piece of the UI that has its own logic and appearance, A Component can be small as a button or as large as an entire Page"
+
+.....................................................................................
+
+In coding 
+
+There two libs 
+1.react.js  => to create component and manages all features related component.
+2.react-dom => Render engine.
+
+react.js
+
+1.React
+  It top level class which provides all apis to create,delete,update components.
+
+react-dom.js
+
+2.ReactDOM
+
+   It is top level class which provides api to flush the v.dom into real dom.
+
+........................................................................................................................................................................................................................................
+								Component Creational patterns
+.........................................................................................................................................................................................................................................
+
+
+1.variable pattern
+2.functional pattern
+3.es 6 class pattern
+
+     					Components can be created any one or mixed way  style.
+   					"functional Pattern" is more popular and recommended pattern....
+
+
+
+1.variable pattern
+import { createRoot } from "react-dom/client"
+
+//variable pattern 
+//Here Heading is just variable , referencing the Component
+//<h1>xxx</h1> -  Component
+const Heading = <h1>Hello React! How are you?</h1>
+
+createRoot(document.getElementById('root')).render(Heading)
+
+
+2.functional pattern
+
+ 2.1.normal function - es 5 function
+ 2.1.arrow function -  es 6 function 
+
+es 5 function:
+import { createRoot } from "react-dom/client"
+
+//functions 
+function Heading() {
+    return <h1>Hello, React!</h1>
+}
+
+createRoot(document.getElementById('root')).render(Heading())
+
+render(Heading()) -  here we invoke function which is not recommended 
+
+render(<Heading></Heading>) - here we use like html tag 
+render(<Heading/>) - here we use like html tag -self closing
+
+import { createRoot } from "react-dom/client"
+
+//functions 
+function Heading() {
+    return <h1>Hello, React!</h1>
+}
+
+// createRoot(document.getElementById('root')).render(Heading())
+// createRoot(document.getElementById('root')).render(<Heading></Heading>)
+
+createRoot(document.getElementById('root')).render(<Heading/>)
+
+
+2.1.arrow function -  es 6 function 
+import { createRoot } from "react-dom/client"
+
+//arrow
+// const Heading = () => {
+//     return <h1>Hello, React!</h1>
+// }
+const Heading = () => <h1>Hello, React!</h1>
+
+createRoot(document.getElementById('root')).render(<Heading />)
+.....................................................................................
+			 ES6 Classes
+.....................................................................................
+The latest react echo system, does not recommend to go with class patterns.
+
+import React from "react"
+import { createRoot } from "react-dom/client"
+
+class Heading extends React.Component {
+
+    render() {
+        return <h1>Hello React!!</h1>
+    }
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
