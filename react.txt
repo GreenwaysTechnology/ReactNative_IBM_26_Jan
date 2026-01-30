@@ -955,4 +955,127 @@ const User = props => <div>
 </div>
 
 export { User }
+............................................................................................
+				List Render
+............................................................................................		
+How to render list/Array?
+
+npm create vite@latest list-app
+
+
+To iterate list in react/reactnative
+
+1.map
+2.filter
+3.find
+4.reduce
+
+based on arrays we can create many layouts
+
+1.listView - ul--li
+2.gridView - table tag
+3.cardView - div/section
+
+using map:
+
+App.jsx
+
+import { List } from "./list/List";
+
+function App() {
+
+  const subjects = ['React', 'ReactNative', 'Javascript', 'Mobile', 'Devops', 'Cloud']
+  return <>
+    <List subjects={subjects} />
+  </>
+}
+export default App;
+
+src/list/List.jsx
+
+const List = (props) => {
+    return <div>
+        <h1>List</h1>
+        <ul>
+            {
+                props.subjects.map(subject => {
+                    return <li>{subject}</li>
+                })
+            }
+        </ul>
+    </div>
+}
+export { List }
+.........................................................................................
+		      How to render list of objects
+...........................................................................................
+Using mock data
+
+import { ProductList } from "./list/List";
+import { PRODUCTS } from "./mock-data/products";
+
+function App() {
+
+    return <>
+        <ProductList products={PRODUCTS} />
+    </>
+}
+export default App;
+
+List.jsx
+
+const ProductList = ({ products }) => {
+    return <div>
+        {
+            products.map(product => {
+                return <div key={product.id}>
+                    <h2>{product.title}</h2>
+                    <img src={product.image} height={150} width={150} />
+                    <h5>Category: {product.category} Price : $ {product.price}</h5>
+                    <p>{product.description} </p>
+                    <h3>Rating : {product.rating.rate} Total {product.rating.count}</h3>
+                </div>
+            })
+        }
+    </div>
+}
+export { ProductList }
+...........................................................................................
+				Component Composition and List
+...........................................................................................
+
+List.jsx
+import { ListItem } from "./ListeItem"
+
+const ProductList = ({ products }) => <div>{
+    products.map(product => <ListItem product={product} />)
+}
+</div>
+
+export { ProductList }
+
+ListItem.jsx
+
+const ListItem = props => {
+    return <div key={props.product.id}>
+        <h2>{props.product.title}</h2>
+        <img src={props.product.image} height={150} width={150} />
+        <h5>Category: {props.product.category} Price : $ {props.product.price}</h5>
+        <p>{props.product.description} </p>
+        <h3>Rating : {props.product.rating.rate} Total {props.product.rating.count}</h3>
+    </div>
+}
+export { ListItem }
+
+App.jsx
+import { ProductList } from "./list/List";
+import { PRODUCTS } from "./mock-data/products";
+
+function App() {
+
+    return <>
+        <ProductList products={PRODUCTS} />
+    </>
+}
+export default App;
 
