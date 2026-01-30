@@ -813,3 +813,146 @@ const User = ({ id, userName, email, address: { city }, status }) => <div>
 </div>
 
 export { User }
+..............................................................................
+		Adding feature to the User Component -Image-Avatar
+		   Component Composition and Props
+...............................................................................
+src/avatar/Avatar.jsx
+
+const Avatar = ({ profilePic }) => <img src={profilePic} height={100} width={100} />
+
+export { Avatar }
+
+src/users/User.jsx
+import { Avatar } from "../avatar/Avatar"
+
+const User = ({ id, userName, email, address: { city }, status, profilePic }) => <div>
+    {/* <img src={profilePic} height={100} width={100} /> */}
+    <Avatar profilePic={profilePic} />
+    <h3>Id : {id}</h3>
+    <h3>Name : {userName}</h3>
+    <h4>Email : {email}</h4>
+    <h4>City : {city}</h4>
+    <h4>Status : {status ? "Available" : "Not Available"}</h4>
+</div>
+
+export { User }
+
+src/App.jsx
+import { User } from "./users/User";
+
+function App() {
+    const profilePic = 'https://imgur.com/1bX5QH6.jpg'
+    return <>
+        <User id={1} profilePic={profilePic} email='subu@gmail.com' userName='Subramanian Murugan' address={{ city: 'Coimbatore' }} status={true} />
+    </>
+
+}
+export default App;
+
+How to inspect component tree?
+ React dev tools
+..................................................................................................................................................................................................................................
+									 Default Props
+....................................................................................................................................................................................................................................
+
+component can receive more no number of properties, all properties we don't need it, if you want to use only specific properties , then we can use default props
+
+Having defaults for any component when you design it.
+
+
+src/users/User.jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+
+const User = ({ id = 0, userName = 'Your Name', email = 'Your email', address: { city = "Your City", state = "Your state" } = {}, status = false }) => <div>
+    <h3>Id : {id}</h3>
+    <h3>Name : {userName}</h3>
+    <h4>Email : {email}</h4>
+    <h4>City : {city}</h4>
+    <h4>State :{state}</h4>
+    <h4>Status : {status ? "Available" : "Not Available"}</h4>
+</div>
+
+const App = () => {
+    return <>
+        <User id={1} email='subu@gmail.com' userName='Subramanian Murugan' address={{ city: 'Coimbatore' }} status={true} />
+        <User />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+.................................................................................
+			Forwarding Props with jsx Spread Notation
+.................................................................................
+
+Use Case : with Spread Notation:
+................................
+src/users/UserDetails.jsx
+import { Avatar } from "../avatar/Avatar"
+
+const UserDetails = ({ id = 0, userName = 'Your Name', email = 'Your email', city = "Your City", status = false, profilePic = '' }) => <div>
+    <Avatar profilePic={profilePic} />
+    <h3>Id : {id}</h3>
+    <h3>Name : {userName}</h3>
+    <h4>Email : {email}</h4>
+    <h4>City : {city}</h4>
+    <h4>Status : {status ? "Available" : "Not Available"}</h4>
+</div>
+
+export { UserDetails }
+
+src/users/User.jsx
+import { UserDetails } from "./UserDetails"
+
+const User = ({ id = 0, userName = 'Your Name', email = 'Your email', address: { city = "Your City" }, status = false, profilePic = '' }) => <div>
+    <UserDetails id={id}
+        userName={userName}
+        email={email}
+        city={city}
+        status={status}
+        profilePic={profilePic} />
+</div>
+
+
+
+export { User }
+src/App.jsx
+import { User } from "./users/User";
+
+function App() {
+    const profilePic = 'https://imgur.com/1bX5QH6.jpg'
+    return <>
+        <User id={1} profilePic={profilePic} email='subu@gmail.com' userName='Subramanian Murugan' address={{ city: 'Coimbatore' }} status={true} />
+    </>
+}
+export default App;
+
+
+........
+
+    <UserDetails id={id}
+        userName={userName}
+        email={email}
+        city={city}
+        status={status}
+        profilePic={profilePic} />
+
+Here we pass every prop manually, that can be avoided using spread notation.
+
+Using Spread Notation:
+src/users/User.jsx
+import { UserDetails } from "./UserDetails"
+
+const User = props => <div>
+    {/* ... is Spread Notation: pass every property */}
+    <UserDetails {...props}  />
+</div>
+
+export { User }
+

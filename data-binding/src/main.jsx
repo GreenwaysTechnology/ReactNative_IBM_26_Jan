@@ -1,68 +1,36 @@
 import { createRoot } from 'react-dom/client'
 
-// function User(props) {
-//     const { id, name, status, address } = props
-//     return <div>
-//         <h1>Id : {id}</h1>
-//         <h2>Name : {name}</h2>
-//         <h2>Status : {status ? "Available" : "Not Available"}</h2>
-//         <h3>Address: {address.city}</h3>
-//     </div>
-// }
-// function User(props) {
-//     const { id, name, status, address: { city } } = props
-//     return <div>
-//         <h1>Id : {id}</h1>
-//         <h2>Name : {name}</h2>
-//         <h2>Status : {status ? "Available" : "Not Available"}</h2>
-//         <h3>Address: {city}</h3>
-//     </div>
-// }
-// function User({ id, name, status, address: { city } }) {
-//     return <div>
-//         <h1>Id : {id}</h1>
-//         <h2>Name : {name}</h2>
-//         <h2>Status : {status ? "Available" : "Not Available"}</h2>
-//         <h3>Address: {city}</h3>
-//     </div>
-// }
-// const User = ({ id, name, status, address: { city } }) => {
-//     return <div>
-//         <h1>Id : {id}</h1>
-//         <h2>Name : {name}</h2>
-//         <h2>Status : {status ? "Available" : "Not Available"}</h2>
-//         <h3>Address: {city}</h3>
-//     </div>
-// }
-const User = ({ id, name, status, address: { city } }) => <div>
-    <h1>Id : {id}</h1>
-    <h2>Name : {name}</h2>
-    <h2>Status : {status ? "Available" : "Not Available"}</h2>
-    <h3>Address: {city}</h3>
+import { Avatar } from "./components/user/Avatar"
+
+export const UserDetails = ({ title, id = 0, userName = 'Your Name', email = 'Your email', city = "Your City", status = false, profilePic = '' }) => <div>
+    <h1>{title}</h1>
+    <Avatar pic={profilePic} />
+    <h3>Id : {id}</h3>
+    <h3>Name : {userName}</h3>
+    <h4>Email : {email}</h4>
+    <h4>City : {city}</h4>
+    <h4>Status : {status ? "Available" : "Not Available"}</h4>
 </div>
 
+//passing pro from user to userdetails manually.
 
+// const User = ({ id = 0, userName = 'Your Name', email = 'Your email', address: { city = "Your City" }, status = false, profilePic = '' }) => <div>
+//     <UserDetails id={id}
+//         userName={userName}
+//         email={email}
+//         city={city}
+//         status={status}
+//         profilePic={profilePic} />
+// </div>
+const User = props => <div>
+    {/* forwarding props : pass all props to child component */}
+    <UserDetails {...props} title="Profile Management system" />
+</div>
 function App() {
+    const profilePic = 'https://imgur.com/1bX5QH6.jpg'
     return <>
-        <User
-            id={1}
-            name='Subramanian'
-            status={true}
-            address={{ city: 'Coimbatore' }}
-        />
-        <User
-            id={2}
-            name='Murugan'
-            status={true}
-            address={{ city: 'Coimbatore' }}
-        />
-        <User
-            id={3}
-            name='Ram'
-            status={false}
-            address={{ city: 'Chennai' }}
-        />
+        <User id={1} profilePic={profilePic} email='subu@gmail.com' userName='Subramanian Murugan' address={{ city: 'Coimbatore' }} status={true} />
     </>
 }
-
 createRoot(document.getElementById('root')).render(<App />)
+
