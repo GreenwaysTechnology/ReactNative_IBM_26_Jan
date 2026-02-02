@@ -2489,3 +2489,345 @@ export default function App() {
     return <Customer />
 }
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+Mutable syntax:
+
+this.state.customer.contact.communcation.mobileNo = '343434343434'
+
+	The mutable syntax you cant use inside setState, but now a days is possible how?
+
+		      Complexity of Immutable Objects 
+					 and 
+			How to solve  them using 
+			     immer.js
+..........................................................................................................................................................
+What is immer?
+  immer is simple js lib, which helps to write complex immutable code in "mutable way" like regular JavaScript way.
+
+
+immutable syntax to update object property:
+
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        }
+    }
+
+     return {
+                ...prevState, //level -0 copy
+                house: {
+                    ...prevState.house, // level-1 copy
+                    points: prevState.house.points + 2
+                }
+        }
+
+js syntax:
+
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        }
+    }
+
+update state:
+
+state.house.points +=2
+
+immer is lib which takes care of writing immutable code on behalf of us, developer writes mutable code, immer converts into immutable code.
+
+
+Immer core concept:
+
+immer provides a function called "produce"
+
+produce(state,(draft)=>{
+   draft.house.points +=2
+})
+
+produce function must be written inside this.setState function.
+
+
+Getting started:
+
+steps:
+
+1.install immer lib
+
+npm i immer
+
+import { produce } from "immer";
+import React from "react";
+
+class Review extends React.Component {
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        },
+
+    }
+
+    onLike = () => {
+        //using immutable logic
+        // this.setState(prevState => {
+        //     return {
+        //         ...prevState, //level-0-copy // copy all outer keys of state
+        //         house: {
+        //             ...prevState.house, // level-1 copy //copy all state except points
+        //             points: prevState.house.points + 1
+        //         }
+        //     }
+        // })
+
+        // this.setState(prevState => {
+        //     return produce(prevState, draft => {
+        //         //write logic
+        //         draft.house.points += 1
+        //     })
+        // })
+        // this.setState(prevState => produce(prevState, draft => {
+        //     //write logic
+        //     draft.house.points += 1
+        // }))
+        this.setState(produce(this.state, draft => {
+            //write logic
+            draft.house.points += 1
+        }))
+    }
+    render() {
+        return <div>
+            <h1>House Review App</h1>
+            <h2>{this.state.house.name}</h2>
+            <h2>Points {this.state.house.points}</h2>
+            <button onClick={this.onLike}>Like</button>
+        </div>
+    }
+}
+
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+
+
+Another Example:
+
+import React from 'react'
+import './index.css'
+import { produce } from 'immer'
+
+class Customer extends React.Component {
+    state = {
+        customer: {
+            id: 1,
+            name: 'Subramanian',
+            contact: {
+                address: {
+                    city: 'Chennai'
+                },
+                communcation: {
+                    mobileNo: '9000000'
+                }
+            }
+        }
+    }
+    render() {
+        return <div>
+            <h1>Customer info</h1>
+            <h2>Name : {this.state.customer.name}</h2>
+            <h2>Phone : {this.state.customer.contact.communcation.mobileNo}</h2>
+            <button onClick={() => {
+                this.setState(produce(this.state, (draft) => {
+                    draft.customer.contact.communcation.mobileNo = '8883434343'
+                }))
+            }}>Update Mobile No</button>
+        </div>
+    }
+}
+
+export default function App() {
+    return <Customer />
+}
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+...........................................................................................................................................................................................................................................
+							 Component Life cycles
+........................................................................................................................................................................................................................................
+
+React Component life cycle can be classified into three major phases
+
+1.Mount
+
+2.Update
+
+3.UnMount
+
+1.Mount :
+  Incase of class component
+
+ 1.constructor
+     Called only once in the component initalization
+     constructors are not used very much...
+ 2.render
+    Called for creating object tree-component tree-Virtual DOM
+
+ 3.componentDidMount
+    Called after render method, once the dom is ready- once ui is compltly loaded
+
+    This method is used heavily  used in react all versions.
+
+   It is used to inital data fetching from the apis
+   It is used to write any async task
+   It is used to write websocket connections
+
+
+2.Update
+    When user starts interacting
+   when state is mutated  -setState,forceUpdate
+   when new props are supplied -state as prop
+  
+   render
+      method is called after state mutation, in order to update ui with new state/
+   during render call,it creates vdom, apply an algorthim called "diff", to compute    old tree and new tree, update dom accordingly.
+  
+   componentDidUpdate
+     It is method which is called after render is completed in update cycle.
+    incase if you want fetch data from api after dom updates
+    incase if you want to do any async tasks.
+    
+3.UnMount
+  When component is removed from memory
+ ComponentWillunMount
+   any resource clean up task...
+
+
+import React from "react"
+
+class Parent extends React.Component {
+    constructor() {
+        super()
+        console.log('Parent constructor is called')
+    }
+    render() {
+        console.log('Parent Render is called')
+        return <>
+            <h1>Parent</h1>
+            <Child />
+        </>
+    }
+    componentDidMount() {
+        console.log('Parent componentDidMount is called')
+    }
+    componentDidUpdate() {
+        console.log('Parent componentDidUpdate is called')
+
+    }
+}
+
+class Child extends React.Component {
+    constructor() {
+        super()
+        console.log('Child constructor is called')
+    }
+    render() {
+        console.log('Child Render is called')
+        return <>
+            <h1>Child</h1>
+        </>
+    }
+    componentDidMount() {
+        console.log('Child componentDidMount is called')
+    }
+    componentDidUpdate() {
+        console.log('Child componentDidUpdate is called')
+
+    }
+}
+
+export default function App() {
+    return <Parent />
+}
+
+..........................................................................................................................................................................................................................................
+								API Call and Component Life cycles
+..........................................................................................................................................................................................................................................
+In order to talk to REST API, react has no any opinion regarding which ajax libs should be used
+componentDidMount is used for initialing any async task such as api calls,timers...
+
+Popular ajax libs used inside react
+
+1.fetch
+2.axios
+
+import React, { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import { produce } from 'immer'
+
+class User extends React.Component {
+
+    state = {
+        users: [],  // handle actual user data
+        isLoading: false, //handle spinner
+        error: null
+    }
+
+    async componentDidMount() {
+        //const url = 'http://localhost:3000/api/users'
+        const url = 'https://jsonplaceholder.typicode.com/users'
+        try {
+            const response = await fetch(url)
+            const users = await response.json()
+            this.setState(produce(this.state, (draft) => {
+                draft.users = users
+                draft.isLoading = true
+            }))
+        }
+        catch (err) {
+            console.log(err)
+            this.setState(produce(this.state, (draft) => {
+                draft.error = err
+                draft.isLoading = true
+            }))
+        }
+    }
+
+    render() {
+        //conditional render
+        const { users, isLoading, error } = this.state
+        if (error) {
+            return <h1>Something went Wrong {error.message}</h1>
+        } else if (!isLoading) {
+            return <h1>Loading....</h1>
+        } else {
+            return <ul>
+                {
+                    users.map(user => {
+                        return <li key={user.id}>
+                            <span>{user.name} {user.email}</span>
+                        </li>
+                    })
+                }
+            </ul>
+        }
+
+    }
+}
+
+
+const App = () => {
+
+    return <>
+        <User />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)

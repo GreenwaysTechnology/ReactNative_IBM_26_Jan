@@ -2,41 +2,59 @@ import { createRoot } from 'react-dom/client'
 import React from 'react'
 import { produce } from 'immer'
 
-class Review extends React.Component {
-    //nested state
+class User extends React.Component {
+
     state = {
-        house: {
-            name: 'RavenClaw',
-            points: 10
-        },
-        locationX: 34,
-        locationY: 45
+        users: [],
+        error: null,
+        isLoading: false
     }
-    onRate = () => {
-        // this.setState(() => {
-        //     return produce(this.state, (draft) => {
-        //         //biz logic ,mutable way
-        //         draft.house.points += 1
-        //     })
-        // })
-        this.setState(produce(this.state, draft => {
-            draft.house.points += 1
-        }))
+    fetchUsers = async () => {
+        try {
+            const url = 'https://jsonplaceholder.typicode.com/users'
+            const response = await fetch(url)
+            const users = await response.json()
+            this.setState(produce(this.state, draft => {
+                draft.users = users
+                draft.isLoading = true
+            }))
+        }
+        catch (err) {
+            this.setState(produce(this.state, draft => {
+                draft.error = err
+                draft.isLoading = true
+            }))
+        }
+    }
+    componentDidMount() {
+        //api calls
+        this.fetchUsers();
     }
 
+
     render() {
-        return <div>
-            <h1>Name : {this.state.house.name}</h1>
-            <h2>Pointers : {this.state.house.points}</h2>
-            <h2>Location {this.state.locationX},{this.state.locationY}</h2>
-            <button onClick={this.onRate}>Rate</button>
-        </div>
+        const { users, error, isLoading } = this.state
+        //show different ui: one for error, loading, data
+        if (error) {
+            return <h1>Something went Wrong!</h1>
+        } else if (!isLoading) {
+            return <h1>Loading...</h1>
+        } else {
+            return <ul>
+                {users.map(user => {
+                    return <li key={user.id}>
+                        <span>{user.name} {user.email}</span>
+                    </li>
+                })}
+            </ul>
+        }
+
     }
 }
 
 function App() {
     return <>
-        <Review />
+        <User />
     </>
 }
 createRoot(document.getElementById('root')).render(<App />)
