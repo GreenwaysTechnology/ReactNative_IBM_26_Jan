@@ -1834,3 +1834,658 @@ Object.freeze(todos)
 
 console.log(add(todos, { title: 'Learn Microservices', done: false }));
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+....................................................................................
+								 React state mutation and pure functions
+.....................................................................................
+
+this.setState()
+  pure function which returns immutable object always..
+
+syntax:
+ this.setState(function(state,props){
+     //return immutable object
+    return {} / object.assign / spread notation
+ })
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import React from 'react'
+
+class Review extends React.Component {
+    //declare component(Review State)
+    state = {
+        like: 0
+    }
+    //listener
+    onIncrement = () => {
+        //you have to write pure function so that react automatically updates
+        //react provides inbuilt pure functio through which we can mutate state
+        //prevState is just variable points this.state only
+        this.setState((prevState) => {
+            //return immutable object
+            //way 1
+            // return {
+            //     like: prevState.like + 1
+            // }
+            //way -2
+            // return Object.assign({}, prevState, { like: prevState.like + 1 })
+            //way -3 
+            return { ...prevState, like: prevState.like + 1 }
+        })
+        //after returning new state, react engine internally invokes render, so that ui 
+        //is updated
+
+    }
+
+    render() {
+        console.log('state inside Render : ', this.state)
+        return <div>
+            <h1>Review App</h1>
+            <h2>Like : {this.state.like}</h2>
+            <button onClick={this.onIncrement}>Like</button>
+        </div>
+    }
+}
+
+
+const App = () => {
+    return <>
+        <Review />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+.............
+code Refactoring:
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import React from 'react'
+
+class Review extends React.Component {
+    state = {
+        like: 0
+    }
+    onIncrement = () => {
+        // this.setState((prevState) => {
+        //     return { ...prevState, like: prevState.like + 1 }
+        // })
+        // this.setState((prevState) => ({ ...prevState, like: prevState.like + 1 }))
+        this.setState(({ ...this.state, like: this.state.like + 1 }))
+    }
+
+    render() {
+        console.log('state inside Render : ', this.state)
+        return <div>
+            <h1>Review App</h1>
+            <h2>Like : {this.state.like}</h2>
+            <button onClick={this.onIncrement}>Like</button>
+        </div>
+    }
+}
+const App = () => {
+    return <>
+        <Review />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+.................................................................................
+		Multi State variable
+.................................................................................
+import React from "react";
+
+
+class Review extends React.Component {
+
+    state = {
+        like: 0,
+        dislike: 0
+    }
+    //listener 
+    onLike = () => {
+        this.setState(prevState => {
+            return { ...prevState, like: prevState.like + 1 }
+        })
+    }
+    onDislike = () => {
+        this.setState(prevState => {
+            return { ...prevState, dislike: prevState.dislike + 1 }
+        })
+    }
+    render() {
+        return <div>
+            <h1>Review App</h1>
+            <h2>Like : {this.state.like}  Dislike : {this.state.dislike}</h2>
+            <button onClick={this.onLike}>Like</button>
+            <button onClick={this.onDislike}>Dislike</button>
+
+        </div>
+    }
+}
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+................................................................................
+								InLine Listeners
+...............................................................................
+import React from "react";
+
+
+class Review extends React.Component {
+    state = {
+        like: 0,
+        dislike: 0
+    }
+    render() {
+        return <div>
+            <h1>Review App</h1>
+            <h2>Like : {this.state.like}  Dislike : {this.state.dislike}</h2>
+            <button onClick={() => {
+                this.setState(prevState => {
+                    return { ...prevState, like: prevState.like + 1 }
+                })
+            }}>Like</button>
+            <button onClick={() => {
+                this.setState(prevState => {
+                    return { ...prevState, dislike: prevState.dislike + 1 }
+                })
+            }}>Dislike</button>
+
+        </div>
+    }
+}
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+								Item Selection and State
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+//list and listener: select item 
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import React from 'react'
+import PRODUCTS from './mock-data/products'
+
+class Products extends React.Component {
+    state = {
+        products: PRODUCTS,
+        selectedProduct: null
+    }
+
+    //method to get product data which is not listner
+    onProductSelected = (product) => {
+        // this.setState((prevState) => {
+        //     return {
+        //         ...prevState, selectedProduct: product
+        //     }
+        // })
+        this.setState(({ ...this.state, selectedProduct: product }))
+    }
+    render() {
+        return <div>
+            {
+                this.state.products.map(product => {
+                    return <section key={product.id}>
+                        <p style={{ cursor: 'pointer' }} onClick={() => {
+                            this.onProductSelected(product)
+                        }}>{product.title}</p>
+                    </section>
+                })
+            }
+            {this.state.selectedProduct ? <div>
+                <h1>Id : {this.state.selectedProduct.id}</h1>
+                <h2>Price :{this.state.selectedProduct.price}</h2>
+                <img src={this.state.selectedProduct.image} height={100} width={100} />
+            </div> : <h1>No Product Selected</h1>}
+
+        </div>
+    }
+}
+
+
+const App = () => {
+    return <>
+        <Products />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+..................................................................................................
+			Component Composition: state as prop, listener as prop
+	   	     			(Dynamic Prop)
+..............................................................................................
+
+Yes,With Respect to "props" every function is pure.
+
+................................................................................
+	Component Composition: state as prop, listener as prop
+	   	     (Dynamic Prop)
+..............................................................................
+import React from "react";
+
+
+class Review extends React.Component {
+    state = {
+        like: 0,
+        dislike: 0
+    }
+    onLike = () => {
+        this.setState(prevState => {
+            return { ...prevState, like: prevState.like + 1 }
+        })
+    }
+    onDislike = () => {
+        this.setState(prevState => {
+            return { ...prevState, dislike: prevState.dislike + 1 }
+        })
+    }
+    render() {
+        return <ReviewDashboard {...this.state} onLike={this.onLike} onDislike={this.onDislike} />
+    }
+}
+const ReviewDashboard = props => {
+    return <div>
+        <h1>Review App</h1>
+        <h2>Like : {props.like}  Dislike : {props.dislike}</h2>
+        <button onClick={props.onLike}>Like</button>
+        <button onClick={props.onDislike}>Dislike</button>
+    </div>
+}
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+
+.......................................................................................................
+                            setState and Object Destructuring
+.....................................................................................................
+								
+import React from "react";
+
+
+class Review extends React.Component {
+    state = {
+        like: 0,
+        dislike: 0
+    }
+    onLike = () => {
+        // this.setState(prevState => {
+        //     return { ...prevState, like: prevState.like + 1 }
+        // })
+        // this.setState(prevState => ({ ...prevState, like: prevState.like + 1 }))
+
+        this.setState(({ ...this.state, like: this.state.like + 1 }))
+
+    }
+    onDislike = () => {
+        // this.setState(prevState => ({ ...prevState, dislike: prevState.dislike + 1 }))
+        this.setState(({ ...this.state, dislike: this.state.dislike + 1 }))
+
+    }
+    render() {
+        return <ReviewDashboard {...this.state} onLike={this.onLike} onDislike={this.onDislike} />
+    }
+}
+const ReviewDashboard = props => {
+    return <div>
+        <h1>Review App</h1>
+        <h2>Like : {props.like}  Dislike : {props.dislike}</h2>
+        <button onClick={props.onLike}>Like</button>
+        <button onClick={props.onDislike}>Dislike</button>
+    </div>
+}
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+
+.....................................................................................................
+					Nested State
+....................................................................................................
+
+simple state:
+
+state = {
+   like:0
+}
+
+
+State with in state:
+.................................
+state= {
+   house:{
+     name:'RavenClaw',
+     points:10
+   }
+}
+import React from "react";
+
+
+class Review extends React.Component {
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        },
+
+    }
+
+    onLike = () => {
+        this.setState(prevState => {
+            return {
+                ...prevState, //level-0-copy // copy all outer keys of state
+                house: {
+                    ...prevState.house, // level-1 copy //copy all state except points
+                    points: prevState.house.points + 1
+                }
+
+            }
+        })
+    }
+    render() {
+        return <div>
+            <h1>House Review App</h1>
+            <h2>{this.state.house.name}</h2>
+            <h2>Points {this.state.house.points}</h2>
+            <button onClick={this.onLike}>Like</button>
+        </div>
+    }
+}
+
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+
+.....................................................................................
+				Deep Nesting
+.....................................................................................
+
+Assigment:
+    state = {
+        customer: {
+            id: 1,
+            name: 'Subramanian',
+            contact: {
+                address: {
+                    city: 'Chennai'
+                },
+                communication: {
+                    mobileNo: '9000000'
+                }
+            }
+        }
+    }
+
+How to update mobileNo - 834343434
+
+import React from 'react'
+import './index.css'
+
+class Customer extends React.Component {
+    state = {
+        customer: {
+            id: 1,
+            name: 'Subramanian',
+            contact: {
+                address: {
+                    city: 'Chennai'
+                },
+                communcation: {
+                    mobileNo: '9000000'
+                }
+            }
+        }
+    }
+    render() {
+        return <div>
+            <h1>Customer info</h1>
+            <h2>Name : {this.state.customer.name}</h2>
+            <h2>Phone : {this.state.customer.contact.communcation.mobileNo}</h2>
+            <button onClick={() => {
+                this.setState((prevState) => {
+                    return {
+                        ...prevState, // leve-0 copy
+                        customer: {
+                            ...prevState.customer, // level-1 copy
+                            contact: {
+                                ...prevState.customer.contact, // level-2 copy
+                                communcation: {
+                                    ...prevState.customer.communcation,
+                                    mobileNo: '4444444'
+                                }
+                            }
+                        }
+                    };
+                  
+
+                })
+            }}>Update Mobile No</button>
+        </div>
+    }
+}
+
+export default function App(){
+    return <Customer/>
+}
+..........................................................................................................................................................................................................................................
+					Update state using immutability syntax and mutable syntax
+......................................................................................................................................................................................................................................
+
+Immutablity syntax:
+ this.setState((prevState) => {
+                    return {
+                        ...prevState, // leve-0 copy
+                        customer: {
+                            ...prevState.customer, // level-1 copy
+                            contact: {
+                                ...prevState.customer.contact, // level-2 copy
+                                communcation: {
+                                    ...prevState.customer.communcation,
+                                    mobileNo: '4444444'
+                                }
+                            }
+                        }
+                    };
+                  
+
+Mutable syntax:
+
+this.state.customer.contact.communcation.mobileNo = '343434343434'
+
+	The mutable syntax you cant use inside setState, but now a days is possible how?
+
+		      Complexity of Immutable Objects 
+					 and 
+			How to solve  them using 
+			     immer.js
+..........................................................................................................................................................
+What is immer?
+  immer is simple js lib, which helps to write complex immutable code in "mutable way" like regular JavaScript way.
+
+
+immutable syntax to update object property:
+
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        }
+    }
+
+     return {
+                ...prevState, //level -0 copy
+                house: {
+                    ...prevState.house, // level-1 copy
+                    points: prevState.house.points + 2
+                }
+        }
+
+js syntax:
+
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        }
+    }
+
+update state:
+
+state.house.points +=2
+
+immer is lib which takes care of writing immutable code on behalf of us, developer writes mutable code, immer converts into immutable code.
+
+
+Immer core concept:
+
+immer provides a function called "produce"
+
+produce(state,(draft)=>{
+   draft.house.points +=2
+})
+
+produce function must be written inside this.setState function.
+
+
+Getting started:
+
+steps:
+
+1.install immer lib
+
+npm i immer
+
+import { produce } from "immer";
+import React from "react";
+
+class Review extends React.Component {
+    state = {
+        house: {
+            name: 'RavenClaw',
+            points: 10
+        },
+
+    }
+
+    onLike = () => {
+        //using immutable logic
+        // this.setState(prevState => {
+        //     return {
+        //         ...prevState, //level-0-copy // copy all outer keys of state
+        //         house: {
+        //             ...prevState.house, // level-1 copy //copy all state except points
+        //             points: prevState.house.points + 1
+        //         }
+        //     }
+        // })
+
+        // this.setState(prevState => {
+        //     return produce(prevState, draft => {
+        //         //write logic
+        //         draft.house.points += 1
+        //     })
+        // })
+        // this.setState(prevState => produce(prevState, draft => {
+        //     //write logic
+        //     draft.house.points += 1
+        // }))
+        this.setState(produce(this.state, draft => {
+            //write logic
+            draft.house.points += 1
+        }))
+    }
+    render() {
+        return <div>
+            <h1>House Review App</h1>
+            <h2>{this.state.house.name}</h2>
+            <h2>Points {this.state.house.points}</h2>
+            <button onClick={this.onLike}>Like</button>
+        </div>
+    }
+}
+
+
+function App() {
+    return <>
+        <Review />
+    </>
+}
+export default App;
+
+
+Another Example:
+
+import React from 'react'
+import './index.css'
+import { produce } from 'immer'
+
+class Customer extends React.Component {
+    state = {
+        customer: {
+            id: 1,
+            name: 'Subramanian',
+            contact: {
+                address: {
+                    city: 'Chennai'
+                },
+                communcation: {
+                    mobileNo: '9000000'
+                }
+            }
+        }
+    }
+    render() {
+        return <div>
+            <h1>Customer info</h1>
+            <h2>Name : {this.state.customer.name}</h2>
+            <h2>Phone : {this.state.customer.contact.communcation.mobileNo}</h2>
+            <button onClick={() => {
+                this.setState(produce(this.state, (draft) => {
+                    draft.customer.contact.communcation.mobileNo = '8883434343'
+                }))
+            }}>Update Mobile No</button>
+        </div>
+    }
+}
+
+export default function App() {
+    return <Customer />
+}
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&

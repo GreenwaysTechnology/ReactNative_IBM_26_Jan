@@ -1,6 +1,5 @@
 import { createRoot } from 'react-dom/client'
 import React from 'react'
-import { produce } from 'immer'
 
 class Review extends React.Component {
     //nested state
@@ -13,14 +12,22 @@ class Review extends React.Component {
         locationY: 45
     }
     onRate = () => {
-        // this.setState(() => {
-        //     return produce(this.state, (draft) => {
-        //         //biz logic ,mutable way
-        //         draft.house.points += 1
-        //     })
-        // })
-        this.setState(produce(this.state, draft => {
-            draft.house.points += 1
+        // this.setState(prevState => {
+        //     //return immutable nested state
+        //     return {
+        //         //level-0 copy
+        //         ...prevState, //copy all keys within state - house key,locationX,locationY
+        //         house: {
+        //             ...prevState.house, //copy all keys within house property
+        //             points: prevState.house.points + 2
+        //         }
+        //     }
+        this.setState(({
+            ...this.state,
+            house: {
+                ...this.state.house,
+                points: this.state.house.points + 2
+            }
         }))
     }
 
