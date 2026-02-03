@@ -1411,7 +1411,7 @@ createRoot(document.getElementById('root')).render(
 )
 
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-									State Mutation getting started
+					State Mutation getting started
 .................................................................................................................................................................................................................................
 
 How Component can change the data?
@@ -1835,7 +1835,7 @@ Object.freeze(todos)
 console.log(add(todos, { title: 'Learn Microservices', done: false }));
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 ....................................................................................
-								 React state mutation and pure functions
+				React state mutation and pure functions
 .....................................................................................
 
 this.setState()
@@ -2305,7 +2305,7 @@ export default function App(){
     return <Customer/>
 }
 ..........................................................................................................................................................................................................................................
-					Update state using immutability syntax and mutable syntax
+		Update state using immutability syntax and mutable syntax
 ......................................................................................................................................................................................................................................
 
 Immutablity syntax:
@@ -2653,10 +2653,8 @@ export default function App() {
     return <Customer />
 }
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-...........................................................................................................................................................................................................................................
-							 Component Life cycles
-........................................................................................................................................................................................................................................
+						 Component Life cycles
+...............................................................................................
 
 React Component life cycle can be classified into three major phases
 
@@ -2686,7 +2684,7 @@ React Component life cycle can be classified into three major phases
 
 
 2.Update
-    When user starts interacting
+   When user starts interacting
    when state is mutated  -setState,forceUpdate
    when new props are supplied -state as prop
   
@@ -2831,3 +2829,324 @@ createRoot(document.getElementById('root')).render(
         <App />
     </StrictMode>,
 )
+..........................................................................................................................................................................................................................................										Functional components, state,life cycle methods
+			 		(Hooks)
+....................................................................................
+
+
+What is hooks and why?
+
+Hooks are simple javascript function which holds Component's logic outside component.
+
+	"Incase of class component , if you define a biz logic, the similar logic if you have in another component, we can't reuse."
+
+React 16 introduced a feature called hooks, by using hooks you can eliminate class components completely, by keeping functional components
+
+Hooks abstract complex  biz logic in reusable manner.
+
+React provides lot of built in hooks to build app , as simple as possible , mean time you can create your own hooks (custom hooks).
+
+Hooks features:
+
+1.hook is simple js function
+2.hook can take input and also return values
+3.every hook function starts with "useHookName"
+
+
+Common Built in Hooks
+
+1.useState
+   To declare state and mutation inside functions
+2.useEffect
+   It represents "Life Methods" - compoentDidMount,componentDidUpdate
+3.useContext
+4.useRef
+5.useMemo
+6.useCallback
+etc......
+
+Thanks to class components ,goodbye to class components....
+.....................................................................................
+State declaration ,mutation:
+...........................
+
+useState:
+
+Syntax:
+
+const [state,setState]=useState(initalState)
+
+state -is just variable it could be any thing, represents current state
+setState -  pure function its name generally setVariableName, A function that updates state
+
+const [counter,setCounter]=useState(initalState)
+
+initalState could be
+
+1.primitive values numbers,string,boolean
+2.objects
+3.arrays
+
+const [counter,setCounter]=useState(0)
+const [state,setState]=useState('hello')
+const [state,setState]=useState(false)
+const [state,setState]=useState(null)
+const [state,setState]=useState({count:0})
+const [state,setState]=useState([])
+..........................................................................................................................................................
+
+
+Simple state:
+import { useState } from "react"
+
+//counter
+const Counter = props => {
+    //state declaration
+    const [counter, setCounter] = useState(0)
+
+    const onIncrement = () => {
+        // setCounter(prevState => {
+        //     return prevState + 1
+        // })
+        setCounter(counter + 1)
+    }
+    return <div>
+        <h1>Counter {counter}</h1>
+        <button onClick={onIncrement}>+</button>
+    </div>
+}
+
+
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+...........................................................................................
+
+Inline Listener:
+import { useState } from "react"
+
+const Counter = props => {
+    const [counter, setCounter] = useState(0)
+    return <div>
+        <h1>Counter {counter}</h1>
+        <button onClick={() => setCounter(counter + 1)}>+</button>
+    </div>
+}
+
+
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+............................
+mutli state:
+
+import { useState } from "react"
+
+const Counter = props => {
+    const [increment, setIncrement] = useState(0)
+    const [decrement, setDecrement] = useState(100)
+    return <div>
+        <h1>Increment {increment} Decrement {decrement}</h1>
+        <button onClick={() => setIncrement(increment + 1)}>+</button>
+        <button onClick={() => setDecrement(decrement - 1)}>-</button>
+
+    </div>
+}
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+............................................................................
+
+Objects and hooks:
+import { useState } from "react"
+
+const Counter = props => {
+    const [counter, setCounter] = useState({ increment: 0, decrement: 100 })
+    return <div>
+        <h1>Increment {counter.increment} Decrement {counter.decrement}</h1>
+        <button onClick={() => {
+            setCounter(prevState => {
+                return {
+                    ...prevState,
+                    increment: prevState.increment + 1
+                }
+            })
+        }}>+</button>
+        <button onClick={() => {
+            setCounter(prevState => {
+                return {
+                    ...prevState,
+                    decrement: prevState.decrement - 1
+                }
+            })
+        }}>-</button>
+
+    </div>
+}
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+..........
+
+Objects and hooks: code refactored
+import { useState } from "react"
+
+const Counter = props => {
+    const [counter, setCounter] = useState({ increment: 0, decrement: 100 })
+    return <div>
+        <h1>Increment {counter.increment} Decrement {counter.decrement}</h1>
+        <button onClick={() => {
+            setCounter(({ ...counter, increment: counter.increment + 1 }))
+        }}>+</button>
+        <button onClick={() => {
+            setCounter(({ ...counter, decrement: counter.decrement - 1 }))
+        }}>-</button>
+    </div>
+}
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+...............................
+
+Objects,hooks,Immerjs:
+.......................
+import { produce } from "immer"
+import { useState } from "react"
+
+const Counter = props => {
+    const [counter, setCounter] = useState({ increment: 0, decrement: 100 })
+    return <div>
+        <h1>Increment {counter.increment} Decrement {counter.decrement}</h1>
+        <button onClick={() => {
+            //setCounter(({ ...counter, increment: counter.increment + 1 }))
+            setCounter(produce(counter, draft => {
+                draft.increment += 1
+            }))
+        }}>+</button>
+        <button onClick={() => {
+            // setCounter(({ ...counter, decrement: counter.decrement - 1 }))
+            setCounter(produce(counter, draft => {
+                draft.decrement -= 1
+            }))
+        }}>-</button>
+    </div>
+}
+
+export default function App() {
+    return <>
+        <Counter />
+    </>
+}
+.................................................................................................................................................................................................
+.......................................................................................
+		CURD operations using hooks,forms,arrays
+........................................................................................
+import { produce } from "immer"
+import { useState } from "react"
+
+const Post = props => {
+    //inital data with some sample posts
+    const [posts, setPosts] = useState([
+        { id: 1, title: 'Post 1', body: 'this is firstPost' },
+        { id: 2, title: 'Post 2', body: 'this is secondPost' }
+    ])
+
+    //to handle forms
+    const [form, setForm] = useState({ title: '', body: '', id: null })
+
+    //to handle submit button either add or update
+    const [isEditing, setIsEditing] = useState(false)
+
+    const updatePost = () => {
+        setPosts(posts.map(post => (post.id === form.id ? form : post)));
+        setForm({ title: '', body: '', id: null })
+        setIsEditing(false)
+    }
+    const addPost = () => {
+        const newPost = { id: Date.now(), title: form.title, body: form.body }
+        setPosts([...posts, newPost])
+        //reset form
+        setForm({ title: '', body: '', id: null })
+    }
+
+    //listeners
+    const handleSubmit = e => {
+        e.preventDefault()
+        isEditing ? updatePost() : addPost()
+    }
+
+    const handleEdit = post => {
+        setForm({ title: post.title, body: post.body, id: post.id })
+        setIsEditing(true)
+    }
+
+    const deletePost = (id) => {
+        setPosts(posts.filter(post => post.id !== id))
+    }
+
+    return <div>
+        <h1>React CURD Application using Plain Array</h1>
+        {/* Form to add new Post */}
+        <form onSubmit={handleSubmit}>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Title"
+                    value={form.title}
+                    required
+                    onChange={e => setForm({ ...form, title: e.target.value })}
+                />
+            </div>
+            <div>
+                <textarea
+                    placeholder="Body"
+                    value={form.body}
+                    required
+                    onChange={e => setForm({ ...form, body: e.target.value })}
+                />
+            </div>
+            <div>
+                <button type="submit">{isEditing ? 'Update' : 'Add'} Post</button>
+            </div>
+        </form>
+
+        {/* List of posts */}
+        <ul>
+            {
+                posts.map(post => {
+                    return <li key={post.id}>
+                        <h2>{post.title}</h2>
+                        <p>{post.body}</p>
+                        <button onClick={() => {
+                            handleEdit(post)
+                        }} >Edit</button>
+                        <button onClick={() => {
+                            deletePost(post.id)
+                        }} >Delete</button>
+                    </li>
+                })
+            }
+        </ul>
+    </div>
+}
+
+export default function App() {
+    return <>
+        <Post />
+    </>
+}
