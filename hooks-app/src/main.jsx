@@ -1,89 +1,66 @@
-import { produce } from 'immer'
-import { StrictMode, useState } from 'react'
+import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { produce } from 'immer'
 
-function Post(props) {
-    //inital post data
-    const [posts, setPosts] = useState([
-        {
-            id: 1, title: 'Post 1', body: 'This is first post'
-        },
-        {
-            id: 2, title: 'Post 2', body: 'This is Second post'
+function Products() {
+    const initialState = {
+        products: [],
+        isLoading: false, //to show spinner
+        error: null
+    }
+    const [products, setProducts] = useState(initialState)
+
+    const fetchProducts = async () => {
+        try {
+            const url = `https://api.escuelajs.co/api/v1/products`
+            const response = await fetch(url)
+            const tmpProducts = await response.json()
+            setProducts(produce(products, (draft) => {
+                draft.products = tmpProducts,
+                    draft.isLoading = true
+            }))
+            console.log(products)
         }
-    ])
-    // to hold form state value
-    const [form, setForm] = useState({ id: null, title: '', body: '' })
-
-    // To track button state - add or update
-    const [isEditing, setIsEditing] = useState(false)
-
-    // listener for form handling
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        isEditing ? updatePost() : addPost()
+        catch (err) {
+            setProducts(produce(products, (draft) => {
+                draft.err = err
+                draft.isLoading = true
+            }))
+        }
     }
-    //functions for adding and updating
-    const updatePost = () => {
-        setPosts(posts.map(post => (post.id === form.id ? form : post)))
-        setForm({ title: '', body: '', id: null })
-        setIsEditing(false)
-    }
-    const addPost = () => {
-        const newPost = { id: posts.length + 1, title: form.title, body: form.body }
-        setPosts([...posts, newPost])
-        //reset form fieldss
-        setForm({ title: '', body: '', id: null })
-    }
-    const handleEdit = post => {
-        setForm({ title: post.title, body: post.body, id: post.id })
-        setIsEditing(true)
-    }
-    const handleDelete = id => {
-        setPosts(posts.filter(post => post.id !== id))
-    }
-
-    return <div>
-        {/* Form to add post into an array */}
-        <form onSubmit={handleSubmit}>
+    useEffect(() => {
+        //api call 
+        fetchProducts()
+    }, [])
+    //conditional rendering: how to use if...else..elseif
+    if (products.error) {
+        return <div>
+            <h1>Error : {error.message}</h1>
+        </div>
+    } else if (!products.isLoading) {
+        return <h2>Loading...</h2>
+    } else {
+        return <div>
+            <h1>Products</h1>
+            <hr />
             <div>
-                <input
-                    type="text"
-                    placeholder="Title"
-                    value={form.title}
-                    required
-                    onChange={e => setForm({ ...form, title: e.target.value })}
-                />
+                {
+                    products.products.map(product => {
+                        return <section>
+                            <img src={product.category.image} height={200} width={200} />
+                            <h1>{product.title} </h1>
+                            <p>{product.description}</p>
+                            <h5>{product.price}</h5>
+                        </section>
+                    })
+                }
             </div>
-            <div>
-                <textarea
-                    placeholder="body"
-                    value={form.body}
-                    onChange={e => setForm({ ...form, body: e.target.value })}
-                />
-            </div>
-            <div>
-                <button type="submit">{isEditing ? " Update" : " Add"} Post</button>
-            </div>
-        </form>
-        {/* List all posts */}
-        {posts.map(post => {
-            return <li key={post.id}>
-                <h2>{post.title}</h2>
-                <p>{post.body}</p>
-                <button onClick={() => {
-                    handleEdit(post)
-                }}>Edit</button>
-                <button onClick={() => {
-                    handleDelete(post.id)
-                }}>Delete</button>
-            </li>
-        })}
-    </div>
+        </div>
+    }
 }
 
 function App() {
-    return <Post />
+    return <Products />
 }
 
 createRoot(document.getElementById('root')).render(
