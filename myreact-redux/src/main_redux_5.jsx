@@ -1,32 +1,25 @@
-import { configureStore, createReducer } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider, useDispatch, useSelector } from 'react-redux'
-import { produce } from 'immer'
 
 //action constant
 const counterIncrement = 'counter/increment'
 const counterDecrement = 'counter/decrement'
 const counterIncrementBy = 'counter/incrementBy'
 
-const initalState = { value: 10 }
-const CounterReducer = createReducer(initalState, builder => {
-    builder.
-        addCase(counterIncrement, (state, action) => {
-            //logic
-            //immer js code: produce function is built in
-            state.value++
-        }).
-        addCase(counterIncrementBy, (state, action) => {
-            //immer js code: produce function is built in
-            state.value += action.payload
-        }).
-        addCase(counterDecrement, (state, action) => {
-            state.value--
-        }).addDefaultCase((state, action) => { })
-})
-
-
+const CounterReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case counterIncrement:
+            return { ...count, value: count.value + 1 }
+        case counterIncrementBy:
+            return { ...count, value: count.value + action.payload }
+        case counterDecrement:
+            return { ...count, value: count.value - 1 }
+        default:
+            return count
+    }
+}
 const store = configureStore({
     reducer: {
         counter: CounterReducer
@@ -48,6 +41,14 @@ function Counter() {
         }
         dispatch(incrementAction)
     }
+
+    //action creator
+    // const incrementBy = payload => {
+    //     return {
+    //         type: counterIncrementBy, payload
+    //     }
+    // }
+    const incrementBy = payload => ({ type: counterIncrementBy, payload })
     return <div>
         <h2>Counter : {count.value}</h2>
         <button onClick={onIncrement}>+</button>
@@ -55,7 +56,7 @@ function Counter() {
             dispatch({ type: counterDecrement })
         }}>-</button>
         <button onClick={() => {
-            dispatch({ type: counterIncrementBy, payload: 2 })
+            dispatch(incrementBy(2))
         }}>IncrementBy</button>
 
     </div>

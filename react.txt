@@ -3672,3 +3672,503 @@ export default function App() {
         <Counter />
     </>
 }
+............................................................................................
+			 Action constant
+...........................................................................................
+import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+
+//action constant
+const counterIncrementAction = 'counter/increment'
+const counterIncrementByAction = 'counter/incrementBy'
+const counterDecrementAction = 'counter/decrement'
+
+//reducer-old way
+const IncrementReducer = (count = { value: 10 }, action) => {
+    //biz logic
+    switch (action.type) {
+        case counterIncrementAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value + 1 }
+        case counterIncrementByAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value + action.payload }
+        default:
+            return count; //default state
+    }
+}
+const DecrementReducer = (count = { value: 10 }, action) => {
+    //biz logic
+    switch (action.type) {
+        case counterDecrementAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value - 1 }
+        default:
+            return count; //default state
+    }
+}
+//step 2 store object
+export const store = configureStore({
+    reducer: {
+        //nameofReducer: ReducerFunction
+        increment: IncrementReducer,
+        decrement: DecrementReducer
+    }
+})
+
+const Increment = () => {
+    const count = useSelector(state => {
+        return state.increment
+    })
+    const dispatch = useDispatch()
+    const onIncrement = () => {
+        dispatch({ type: counterIncrementAction })
+    }
+    return <div>
+        <h1>Count {count.value}</h1>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={() => {
+            dispatch({ type: counterIncrementByAction, payload: 2 })
+        }}>IncrementByTwo</button>
+
+    </div>
+}
+
+const Decrement = () => {
+    const count = useSelector(state => {
+        return state.decrement
+    })
+    const dispatch = useDispatch()
+
+    return <div>
+        <h1>Count {count.value}</h1>
+        <button onClick={() => {
+            dispatch({ type: counterDecrementAction })
+        }}>-</button>
+    </div>
+}
+
+const Counter = () => {
+
+    return <>
+        <Increment />
+        <Decrement />
+    </>
+}
+
+export default function App() {
+
+    return <>
+        <h1>React Redux Integration</h1>
+        <Counter />
+    </>
+}
+.............................................................................................
+				Action Creators
+.............................................................................................
+
+action creator is function which returns action object.
+action creators are used when you pass dynamic input to the reducer.
+
+
+
+import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+
+//action constant
+const counterIncrementAction = 'counter/increment'
+const counterIncrementByAction = 'counter/incrementBy'
+const counterDecrementAction = 'counter/decrement'
+
+//reducer-old way
+const IncrementReducer = (count = { value: 10 }, action) => {
+    //biz logic
+    switch (action.type) {
+        case counterIncrementAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value + 1 }
+        case counterIncrementByAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value + action.payload }
+        default:
+            return count; //default state
+    }
+}
+const DecrementReducer = (count = { value: 10 }, action) => {
+    //biz logic
+    switch (action.type) {
+        case counterDecrementAction:
+            //immutable logic//pure function
+            return { ...count, value: count.value - 1 }
+        default:
+            return count; //default state
+    }
+}
+//step 2 store object
+export const store = configureStore({
+    reducer: {
+        //nameofReducer: ReducerFunction
+        increment: IncrementReducer,
+        decrement: DecrementReducer
+    }
+})
+
+const Increment = () => {
+    const count = useSelector(state => {
+        return state.increment
+    })
+    const dispatch = useDispatch()
+
+
+    const onIncrement = () => {
+        dispatch({ type: counterIncrementAction })
+    }
+
+    //action creator
+    // function incrementBy(payload) {
+    //     return {
+    //         type: counterIncrementByAction,
+    //         payload: payload
+    //     }
+    // }
+    //action creator
+    const incrementBy = payload => ({
+        type: counterIncrementByAction,
+        payload
+    })
+
+    return <div>
+        <h1>Count {count.value}</h1>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={() => {
+            dispatch(incrementBy(2))
+        }}>IncrementByTwo</button>
+
+    </div>
+}
+
+const Decrement = () => {
+    const count = useSelector(state => {
+        return state.decrement
+    })
+    const dispatch = useDispatch()
+
+    return <div>
+        <h1>Count {count.value}</h1>
+        <button onClick={() => {
+            dispatch({ type: counterDecrementAction })
+        }}>-</button>
+    </div>
+}
+
+const Counter = () => {
+
+    return <>
+        <Increment />
+        <Decrement />
+    </>
+}
+
+
+
+export default function App() {
+
+    return <>
+        <h1>React Redux Integration</h1>
+        <Counter />
+    </>
+}
+
+Multi reducer:
+import { configureStore } from '@reduxjs/toolkit'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+
+//action constant
+const counterIncrement = 'counter/increment'
+const counterDecrement = 'counter/decrement'
+const counterIncrementBy = 'counter/incrementBy'
+
+const IncrementReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case counterIncrement:
+            return { ...count, value: count.value + 1 }
+        default:
+            return count
+    }
+}
+const IncrementByReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case counterIncrementBy:
+            return { ...count, value: count.value + action.payload }
+        default:
+            return count
+    }
+}
+const DecrementReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case counterDecrement:
+            return { ...count, value: count.value - 1 }
+        default:
+            return count
+    }
+}
+const store = configureStore({
+    reducer: {
+        increment: IncrementReducer,
+        incrementBy: IncrementByReducer,
+        decrement: DecrementReducer
+    }
+})
+
+//react 
+
+function Increment() {
+    const counter = useSelector(state => {
+        return state.increment
+    })
+    console.log('counter',counter)
+
+    return <h1>Increment : {counter.value}</h1>
+}
+function Decrement() {
+    const counter = useSelector(state => {
+        return state.decrement
+    })
+    return <h1>Decrement : {counter.value}</h1>
+}
+function IncrementBy() {
+    const counter = useSelector(state => {
+        return state.incrementBy
+    })
+    return <h1>IncrementBy : {counter.value}</h1>
+}
+function Counter() {
+    return <div>
+        <Increment />
+        <Decrement/>
+        <IncrementBy/>
+    </div>
+}
+
+
+function App() {
+    return <Provider store={store}>
+        <Counter />
+    </Provider>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+Using immer js produce function
+import { configureStore } from '@reduxjs/toolkit'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+import { produce } from 'immer'
+
+//action constant
+const counterIncrement = 'counter/increment'
+const counterDecrement = 'counter/decrement'
+const counterIncrementBy = 'counter/incrementBy'
+
+const CounterReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case counterIncrement:
+            // return { ...count, value: count.value + 1 }
+            return produce(count, (draft) => {
+                draft.value += 1
+            })
+        case counterIncrementBy:
+            //return { ...count, value: count.value + action.payload }
+            return produce(count, (draft) => {
+                draft.value += action.payload
+            })
+        case counterDecrement:
+            // return { ...count, value: count.value - 1 }
+            return produce(count, (draft) => {
+                draft.value -= 1
+            })
+        default:
+            return count
+    }
+}
+const store = configureStore({
+    reducer: {
+        counter: CounterReducer
+    }
+})
+
+//react 
+
+function Counter() {
+    const count = useSelector(state => {
+        return state.counter
+    })
+    const dispatch = useDispatch()
+
+    const onIncrement = () => {
+        //send action to store via dispatcher
+        const incrementAction = {
+            type: counterIncrement
+        }
+        dispatch(incrementAction)
+    }
+    return <div>
+        <h2>Counter : {count.value}</h2>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={() => {
+            dispatch({ type: counterDecrement })
+        }}>-</button>
+        <button onClick={() => {
+            dispatch({ type: counterIncrementBy, payload: 2 })
+        }}>IncrementBy</button>
+
+    </div>
+}
+
+
+function App() {
+    return <Provider store={store}>
+        <Counter />
+    </Provider>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+
+..............................................................................................
+.....................................................................................
+			 Modern Reducer syntax
+....................................................................................
+
+
+Old way:
+
+const IncrementReducer = (state = { counter: 10 }, action) => {
+    //biz logic
+    switch (action.type) {
+        case incrementBy:
+            return produce(state, (draft) => {
+                draft.counter += action.payload
+            })
+        default:
+            //default state
+            return state;
+    }
+
+}
+
+Redux Toolkit way:
+
+1.using createReducer function
+2.using createSlice function
+
+2.1.Using createReducer api
+
+1.It is utility function from redux-toolkit.
+2.It reduces lot of boiler plate code , provides standards based coding
+3.It is offering built in immer js api, so, no need of using "produce" directly..
+4.No need of switch..case and actions...
+
+
+createReducer api coding has  pattern
+
+1.builder pattern
+
+Syntax:
+
+const reducer= createReducer(initialState,(builder)=>{
+
+     builder.addCase(actionName,(state,action)=>{
+     //immer js code: produce function is built in
+      state.value++
+    }).addCase(actionName,(state,action)=>{
+     //immer js code: produce function is built in
+      state.value++
+   }).addDefaultCase((state,action)=>{})
+
+})
+
+import { configureStore, createReducer } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
+
+//reducer-old way
+// const CounterReducer = (count = 10, action) => {
+//     //biz logic
+//     switch (action.type) {
+//         case 'counter/increment':
+//             //immutable logic//pure function
+//             return count + 1
+
+//         case 'counter/decrement':
+//             //immutable logic//pure function
+//             return count - 1
+//         default:
+//             return count; //default state
+//     }
+// }
+//using createReducer function
+
+let initialState = { value: 0 }
+const incrementAction = 'counter/increment'
+const decrementAction = 'counter/decrement'
+
+const CounterReducer = createReducer(initialState, builder => {
+    //biz logic
+    builder.addCase(incrementAction, (state, action) => {
+        //immer js code directly
+        state.value += 1
+    }).addCase(decrementAction, (state, action) => {
+        //immer js code directly
+        state.value -= 1
+    }).addDefaultCase((state, action) => { })
+})
+
+//step 2 store object
+export const store = configureStore({
+    reducer: {
+        //nameofReducer: ReducerFunction
+        counter: CounterReducer
+    }
+})
+
+
+const Counter = () => {
+    const count = useSelector(state => {
+        return state.counter
+    })
+    const dispatch = useDispatch()
+
+    const onIncrement = () => {
+        dispatch({ type: incrementAction })
+    }
+    return <div>
+        <h1>Count {count.value}</h1>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={() => {
+            dispatch({ type: decrementAction })
+        }}>-</button>
+
+    </div>
+}
+
+
+
+export default function App() {
+
+    return <>
+        <h1>React Redux Integration</h1>
+        <Counter />
+    </>
+}
+

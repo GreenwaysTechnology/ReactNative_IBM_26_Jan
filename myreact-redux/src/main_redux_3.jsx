@@ -1,0 +1,67 @@
+import { configureStore } from '@reduxjs/toolkit'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+
+//redux -reducer
+//counter=0;inital state ; is eq to useState(0)
+//action is object , which is sent by ui(react component)
+//action since object has property type, which defines the type of biz logic
+const CounterReducer = (count = { value: 10 }, action) => {
+    switch (action.type) {
+        case 'counter/increment':
+            return { ...count, value: count.value + 1 }
+        case 'counter/incrementBy':
+            return { ...count, value: count.value + action.payload }
+        case 'counter/decrement':
+            return { ...count, value: count.value - 1 }
+        default:
+            return count
+    }
+}
+const store = configureStore({
+    reducer: {
+        counter: CounterReducer
+    }
+})
+
+//react 
+
+function Counter() {
+    const count = useSelector(state => {
+        return state.counter
+    })
+    const dispatch = useDispatch()
+
+    const onIncrement = () => {
+        //send action to store via dispatcher
+        const incrementAction = {
+            type: 'counter/increment'
+        }
+        dispatch(incrementAction)
+    }
+    return <div>
+        <h2>Counter : {count.value}</h2>
+        <button onClick={onIncrement}>+</button>
+        <button onClick={() => {
+            dispatch({ type: 'counter/decrement' })
+        }}>-</button>
+        <button onClick={() => {
+            dispatch({ type: 'counter/incrementBy', payload: 2 })
+        }}>IncrementBy</button>
+
+    </div>
+}
+
+
+function App() {
+    return <Provider store={store}>
+        <Counter />
+    </Provider>
+}
+
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)

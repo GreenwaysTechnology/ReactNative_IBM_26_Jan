@@ -9,6 +9,28 @@ const counterIncrement = 'counter/increment'
 const counterDecrement = 'counter/decrement'
 const counterIncrementBy = 'counter/incrementBy'
 
+//old way of writing reducer
+// const CounterReducer = (count = { value: 10 }, action) => {
+//     switch (action.type) {
+//         case counterIncrement:
+//             // return { ...count, value: count.value + 1 }
+//             return produce(count, (draft) => {
+//                 draft.value += 1
+//             })
+//         case counterIncrementBy:
+//             //return { ...count, value: count.value + action.payload }
+//             return produce(count, (draft) => {
+//                 draft.value += action.payload
+//             })
+//         case counterDecrement:
+//             // return { ...count, value: count.value - 1 }
+//             return produce(count, (draft) => {
+//                 draft.value -= 1
+//             })
+//         default:
+//             return count
+//     }
+// }
 const initalState = { value: 10 }
 const CounterReducer = createReducer(initalState, builder => {
     builder.
