@@ -1,4 +1,4 @@
-import { StatusBar, Text, View, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert } from "react-native"
+import { StatusBar, Text, View, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList } from "react-native"
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 import menuItems from "./mock-data/menus";
 import { useEffect, useState } from "react";
@@ -33,24 +33,17 @@ function UserListScreen() {
             <ActivityIndicator size="large" color="#00fbff" />
         </View>
     }
-    const selectItem = item => {
-        Alert.alert(item.name)
-    }
 
     //renderItem constant
     const renderItem = ({ item }) => {
-        return <TouchableOpacity onPress={() => {
-            selectItem(item)
-        }}>
-            <View style={styles.card}>
-                <Image style={styles.avatar} source={{ uri: `https://i.pravatar.cc/150?u=${item.email}` }} />
-                <View style={styles.info}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.email}>{item.email}</Text>
-                    <Text style={styles.company}>{item.company.name}</Text>
-                </View>
+        return <View style={styles.card}>
+            <Image style={styles.avatar} source={{ uri: `https://i.pravatar.cc/150?u=${item.email}` }} />
+            <View style={styles.info}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.email}>{item.email}</Text>
+                <Text style={styles.company}>{item.company.name}</Text>
             </View>
-        </TouchableOpacity>
+        </View>
 
     }
 
