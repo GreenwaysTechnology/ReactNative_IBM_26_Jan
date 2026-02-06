@@ -1,67 +1,51 @@
-import { StatusBar, Text, View, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Alert } from "react-native"
+import { StatusBar, Text, View,  StyleSheet, TouchableOpacity, SectionList, ActivityIndicator, FlatList, Alert } from "react-native"
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
-import menuItems from "./mock-data/menus";
-import { useEffect, useState } from "react";
 
-//data
+const CONTACTS = [
+    {
+        title: 'A',
+        data: [
+            { id: '1', name: 'Alice', status: 'Available' },
+            { id: '2', name: 'Adam', status: 'Busy' },
+        ],
+    },
+    {
+        title: 'B',
+        data: [
+            { id: '3', name: 'Bob', status: 'At work' },
+            { id: '4', name: 'Ben', status: 'In meeting' },
+        ],
+    },
+];
 
-function UserListScreen() {
-    const [users, setUsers] = useState([])
-    const [loading, setLoading] = useState(true)
+function ContactsScreen() {
+    return (
+        <SectionList
+            sections={CONTACTS}
+            keyExtractor={(item) => item.id}
 
+            renderItem={({ item }) => (
+                <View style={styles.row}>
+                    <View style={styles.avatar}>
+                        <Text style={styles.avatarText}>
+                            {item.name.charAt(0)}
+                        </Text>
+                    </View>
 
-    const fetchUsers = async () => {
-        try {
-            const res = await fetch('https://jsonplaceholder.typicode.com/users')
-            const data = await res.json()
-            setUsers(data)
-        }
-        catch (err) {
-            console.log("Api error", err)
-        }
-        finally {
-            setLoading(false)
-        }
-
-    }
-    useEffect(() => {
-        fetchUsers()
-    }, [])
-
-    if (loading) {
-        return <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#00fbff" />
-        </View>
-    }
-    const selectItem = item => {
-        Alert.alert(item.name)
-    }
-
-    //renderItem constant
-    const renderItem = ({ item }) => {
-        return <TouchableOpacity onPress={() => {
-            selectItem(item)
-        }}>
-            <View style={styles.card}>
-                <Image style={styles.avatar} source={{ uri: `https://i.pravatar.cc/150?u=${item.email}` }} />
-                <View style={styles.info}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.email}>{item.email}</Text>
-                    <Text style={styles.company}>{item.company.name}</Text>
+                    <View style={styles.contactInfo}>
+                        <Text style={styles.name}>{item.name}</Text>
+                        <Text style={styles.status}>{item.status}</Text>
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>
+            )}
 
-    }
+            renderSectionHeader={({ section: { title } }) => (
+                <Text style={styles.sectionHeader}>{title}</Text>
+            )}
 
-    return <>
-        <FlatList
-            data={users}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={{ padding: 15 }}
+            stickySectionHeadersEnabled
         />
-    </>
+    );
 }
 
 function HomeScreen() {
@@ -72,7 +56,7 @@ function HomeScreen() {
         paddingLeft: insets.left,
         paddingRight: insets.right
     }, styles.container]}>
-        <UserListScreen />
+        <ContactsScreen />
     </View >
 }
 
@@ -87,50 +71,53 @@ export default App
 
 //define Style
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    loader: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
+  container: { flex: 1, backgroundColor: '#fff' },
 
-    card: {
-        flexDirection: "row",
-        backgroundColor: "#fff",
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 12,
-        elevation: 3,
-    },
+  sectionHeader: {
+    paddingHorizontal: 15,
+    paddingVertical: 6,
+    backgroundColor: '#f5f5f5',
+    color: '#666',
+    fontWeight: 'bold',
+  },
 
-    avatar: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-    },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
 
-    info: {
-        marginLeft: 12,
-        flex: 1,
-        justifyContent: "center",
-    },
+  avatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 22,
+    backgroundColor: '#25D366',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
 
-    name: {
-        fontSize: 16,
-        fontWeight: "bold",
-    },
+  avatarText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 
-    email: {
-        color: "#666",
-        marginTop: 2,
-    },
+  contactInfo: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ddd',
+    flex: 1,
+    paddingBottom: 8,
+  },
 
-    company: {
-        marginTop: 4,
-        color: "#007bff",
-        fontSize: 13,
-    },
+  name: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  status: {
+    color: '#666',
+    marginTop: 2,
+  },
 });
-
