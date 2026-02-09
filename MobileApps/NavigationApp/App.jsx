@@ -1,246 +1,355 @@
-import React from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import {
     View,
     Text,
     FlatList,
     TouchableOpacity,
     StyleSheet,
-    StatusBar
+    Image,
 } from 'react-native';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+/* ---------------- CONTEXT ---------------- */
+const AppContext = createContext();
 
-/* ---------------------------
-   Dummy Chat Data
-----------------------------*/
-const chats = [
-    { id: '1', name: 'Ravi' },
-    { id: '2', name: 'Anita' },
-    { id: '3', name: 'John' },
-    { id: '4', name: 'Meena' },
+/* ---------------- PRODUCTS ---------------- */
+const products = [
+    { id: '1', name: 'Laptop', price: 800, image: 'https://picsum.photos/300?1' },
+    { id: '2', name: 'Phone', price: 500, image: 'https://picsum.photos/300?2' },
+    { id: '3', name: 'Headphones', price: 100, image: 'https://picsum.photos/300?3' },
+    { id: '4', name: 'Keyboard', price: 50, image: 'https://picsum.photos/300?4' },
 ];
 
-/* ---------------------------
-   Chat List Screen
-----------------------------*/
-function ChatListScreen({ navigation }) {
-    return (
-        <View style={{ flex: 1 }}>
-            <FlatList
-                data={chats}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.chatItem}
-                        onPress={() =>
-                            navigation.navigate('ChatScreen', {
-                                name: item.name,
-                            })
-                        }
-                    >
-                        <Text style={styles.chatName}>{item.name}</Text>
-                        <Text style={styles.chatMsg}>Last message...</Text>
-                    </TouchableOpacity>
-                )}
-            />
+/* ---------------- LOGIN ---------------- */
+function LoginScreen() {
+    const { login } = useContext(AppContext);
 
-            {/* Floating Button */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => navigation.navigate('NewChat')}
-            >
-                <Text style={{ color: 'white', fontSize: 28 }}>+</Text>
+    return (
+        <View style={styles.center}>
+            <Text style={styles.title}>Shop App Login</Text>
+
+            <TouchableOpacity style={styles.button} onPress={login}>
+                <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
         </View>
     );
 }
 
-/* ---------------------------
-   Chat Screen
-----------------------------*/
-function ChatScreen({ route }) {
+/* ---------------- PRODUCT LIST ---------------- */
+function ProductList({ navigation }) {
+    return (
+        <FlatList
+            data={products}
+            keyExtractor={(i) => i.id}
+            renderItem={({ item }) => (
+                <TouchableOpacity
+                    style={styles.item}
+                    onPress={() => navigation.navigate('Details', { product: item })}
+                >
+                    <Image source={{ uri: item.image }} style={styles.thumb} />
+                    <View style={{ marginLeft: 10 }}>
+                        <Text style={styles.title}>{item.name}</Text>
+                        <Text>${item.price}</Text>
+                    </View>
+                </TouchableOpacity>
+            )}
+        />
+    );
+}
+
+/* ---------------- PRODUCT DETAILS ---------------- */
+function ProductDetails({ route }) {
+    const { product } = route.params;
+    const { addToCart } = useContext(AppContext);
+
     return (
         <View style={styles.center}>
-            <Text style={styles.title}>
-                Chat with {route.params.name}
+            <Image source={{ uri: product.image }} style={styles.detailImage} />
+            <Text style={styles.title}>{product.name}</Text>
+            <Text style={{ marginVertical: 10 }}>
+                Price: ${product.price}
             </Text>
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => addToCart(product)}
+            >
+                <Text style={styles.buttonText}>Add to Cart</Text>
+            </TouchableOpacity>
         </View>
     );
 }
 
-/* ---------------------------
-   New Chat Screen
-----------------------------*/
-function NewChatScreen() {
+/* ---------------- CART ---------------- */
+function CartScreen({ navigation }) {
+    const { cart, increaseQty, decreaseQty } =
+        useContext(AppContext);
+
+    const total = cart.reduce(
+        (sum, i) => sum + i.price * i.qty,
+        0
+    );
+
+    return (
+        <View style={{ flex: 1 }}>
+            <FlatList
+                data={cart}
+                keyExtractor={(i) => i.id}
+                ListEmptyComponent={
+                    <Text style={styles.center}>Cart is empty</Text>
+                }
+                renderItem={({ item }) => (
+                    <View style={styles.cartItem}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={{ uri: item.image }} style={styles.cartThumb} />
+                            <View style={{ marginLeft: 10 }}>
+                                <Text style={styles.title}>{item.name}</Text>
+                                <Text>${item.price} × {item.qty}</Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.qtyRow}>
+                            <TouchableOpacity
+                                style={styles.qtyBtn}
+                                onPress={() => decreaseQty(item.id)}
+                            >
+                                <Text>-</Text>
+                            </TouchableOpacity>
+
+                            <Text style={{ marginHorizontal: 10 }}>{item.qty}</Text>
+
+                            <TouchableOpacity
+                                style={styles.qtyBtn}
+                                onPress={() => increaseQty(item.id)}
+                            >
+                                <Text>+</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+            />
+
+            <View style={styles.totalBox}>
+                <Text style={styles.totalText}>Total: ${total}</Text>
+
+                {cart.length > 0 && (
+                    <TouchableOpacity
+                        style={styles.checkoutBtn}
+                        onPress={() =>
+                            navigation.navigate('Shop', {
+                                screen: 'Checkout',
+                            })
+                        }
+                    >
+                        <Text style={styles.buttonText}>Checkout</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </View>
+    );
+}
+
+/* ---------------- CHECKOUT ---------------- */
+function CheckoutScreen({ navigation }) {
+    const { cart, placeOrder } = useContext(AppContext);
+
+    const total = cart.reduce(
+        (sum, i) => sum + i.price * i.qty,
+        0
+    );
+
     return (
         <View style={styles.center}>
-            <Text style={styles.title}>Start New Chat</Text>
+            <Text style={styles.title}>Checkout</Text>
+            <Text style={{ marginVertical: 10 }}>
+                Order Total: ${total}
+            </Text>
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                    placeOrder();
+                    navigation.replace('Success');
+                }}
+            >
+                <Text style={styles.buttonText}>Place Order</Text>
+            </TouchableOpacity>
         </View>
     );
 }
 
-/* ---------------------------
-   Status Screen
-----------------------------*/
-function StatusScreen() {
+/* ---------------- SUCCESS ---------------- */
+function SuccessScreen({ navigation }) {
     return (
         <View style={styles.center}>
-            <Text style={styles.title}>Status Screen</Text>
+            <Text style={styles.title}>Order Successful!</Text>
+
+            <TouchableOpacity
+                style={[styles.button, { marginTop: 20 }]}
+                onPress={() => navigation.navigate('Products')}
+            >
+                <Text style={styles.buttonText}>Continue Shopping</Text>
+            </TouchableOpacity>
         </View>
     );
 }
 
-/* ---------------------------
-   Calls Screen
-----------------------------*/
-function CallsScreen() {
+/* ---------------- ORDERS ---------------- */
+function OrdersScreen() {
+    const { orders } = useContext(AppContext);
+
     return (
-        <View style={styles.center}>
-            <Text style={styles.title}>Calls Screen</Text>
-        </View>
+        <FlatList
+            data={orders}
+            keyExtractor={(_, i) => i.toString()}
+            ListEmptyComponent={
+                <Text style={styles.center}>No orders yet</Text>
+            }
+            renderItem={({ item }) => (
+                <View style={styles.item}>
+                    <Text style={styles.title}>Order</Text>
+                    <Text>Total: ${item.total}</Text>
+                    <Text>Items: {item.count}</Text>
+                </View>
+            )}
+        />
     );
 }
 
-/* ---------------------------
-   Navigators
-----------------------------*/
+/* ---------------- NAVIGATION ---------------- */
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-/* Chat Stack */
-function ChatStack() {
+function ShopStack() {
     return (
         <Stack.Navigator>
-            <Stack.Screen
-                name="ChatList"
-                component={ChatListScreen}
-                options={{ title: 'My chats' }}
-            />
-            <Stack.Screen
-                name="ChatScreen"
-                component={ChatScreen}
-                options={({ route }) => ({
-                    title: route.params.name,
-                })}
-            />
-            <Stack.Screen
-                name="NewChat"
-                component={NewChatScreen}
-                options={{ title: 'New Chat' }}
-            />
+            <Stack.Screen name="Products" component={ProductList} />
+            <Stack.Screen name="Details" component={ProductDetails} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+            <Stack.Screen name="Success" component={SuccessScreen} />
         </Stack.Navigator>
     );
 }
 
-/* Bottom Tabs */
 function Tabs() {
-    return (
-        <Tab.Navigator
-            screenOptions={({ route }) => ({
-                headerShown: false,
-                tabBarIcon: ({ color, size, focused }) => {
-                    let iconName;
-                    if (route.name === 'Chats') {
-                        iconName = focused
-                            ? 'chatbubble'
-                            : 'chatbubble-outline';
-                    } else if (route.name === 'Status') {
-                        iconName = focused
-                            ? 'ellipse'
-                            : 'ellipse-outline';
-                    } else if (route.name === 'Calls') {
-                        iconName = focused
-                            ? 'call'
-                            : 'call-outline';
-                    }
+    const { logout } = useContext(AppContext);
 
-                    return (
-                        <Ionicons
-                            name={iconName}
-                            size={size}
-                            color={color}
-                        />
-                    );
-                },
-                tabBarLabelStyle: {
-                    fontSize: 14,
-                    fontFamily: 'Georgia',
-                    fontWeight: 'bold',
-                },
-                tabBarBadgeStyle: {
-                    color: 'black',
-                    backgroundColor: 'yellow',
-                },
-                animation: 'fade',
-                tabBarActiveTintColor: '#25d36a',
-                tabBarInactiveTintColor: 'red',
-            })}
-        >
-            <Tab.Screen name="Chats" option component={ChatStack} />
-            <Tab.Screen name="Status" component={StatusScreen} />
-            <Tab.Screen name="Calls" component={CallsScreen} />
+    return (
+        <Tab.Navigator>
+            <Tab.Screen name="Shop" component={ShopStack} />
+            <Tab.Screen name="Cart" component={CartScreen} />
+            <Tab.Screen name="Orders" component={OrdersScreen} />
+            <Tab.Screen
+                name="Logout"
+                component={() => null}
+                listeners={{ tabPress: logout }}
+            />
         </Tab.Navigator>
     );
 }
 
-/* Root App */
+/* ---------------- APP ---------------- */
 export default function App() {
+    const [user, setUser] = useState(null);
+    const [cart, setCart] = useState([]);
+    const [orders, setOrders] = useState([]);
+
+    const login = () => setUser({ name: 'User' });
+    const logout = () => setUser(null);
+
+    const addToCart = (product) => {
+        const existing = cart.find(p => p.id === product.id);
+
+        if (existing) increaseQty(product.id);
+        else setCart([...cart, { ...product, qty: 1 }]);
+    };
+
+    const increaseQty = (id) => {
+        setCart(cart.map(i =>
+            i.id === id ? { ...i, qty: i.qty + 1 } : i
+        ));
+    };
+
+    const decreaseQty = (id) => {
+        setCart(cart
+            .map(i =>
+                i.id === id ? { ...i, qty: i.qty - 1 } : i
+            )
+            .filter(i => i.qty > 0)
+        );
+    };
+
+    const placeOrder = () => {
+        const total = cart.reduce(
+            (sum, i) => sum + i.price * i.qty,
+            0
+        );
+
+        setOrders([...orders, { total, count: cart.length }]);
+        setCart([]);
+    };
+
     return (
-        <NavigationContainer>
-            <StatusBar
-                barStyle="dark-content"
-                backgroundColor="#e8c4c4"
-            />
-            <Tabs />
-        </NavigationContainer>
+        <AppContext.Provider
+            value={{
+                login,
+                logout,
+                cart,
+                orders,
+                addToCart,
+                increaseQty,
+                decreaseQty,
+                placeOrder,
+            }}
+        >
+            <NavigationContainer>
+                {user ? <Tabs /> : <LoginScreen />}
+            </NavigationContainer>
+        </AppContext.Provider>
     );
 }
 
-/* ---------------------------
-   Styles
-----------------------------*/
+/* ---------------- STYLES ---------------- */
 const styles = StyleSheet.create({
-    center: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-
-    chatItem: {
+    item: {
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-
-    chatName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-
-    chatMsg: {
-        color: '#666',
-        marginTop: 4,
-    },
-
-    fab: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: '#25D366',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        borderBottomColor: '#ddd',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 6,
     },
+    cartItem: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    title: { fontSize: 18, fontWeight: 'bold' },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    button: { backgroundColor: 'green', padding: 12, borderRadius: 6 },
+    buttonText: { color: 'white', fontWeight: 'bold' },
+    checkoutBtn: {
+        backgroundColor: '#ff6600',
+        padding: 12,
+        borderRadius: 6,
+        marginTop: 10,
+    },
+    thumb: { width: 60, height: 60, borderRadius: 6 },
+    detailImage: { width: 200, height: 200, borderRadius: 10 },
+    cartThumb: { width: 50, height: 50, borderRadius: 6 },
+    qtyRow: { flexDirection: 'row', alignItems: 'center' },
+    qtyBtn: {
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#999',
+        borderRadius: 4,
+        width: 30,
+        alignItems: 'center',
+    },
+    totalBox: { padding: 16, borderTopWidth: 1, borderColor: '#ddd' },
+    totalText: { fontSize: 18, fontWeight: 'bold' },
 });

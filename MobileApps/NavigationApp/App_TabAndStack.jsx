@@ -1,0 +1,246 @@
+import React from 'react';
+import {
+    View,
+    Text,
+    FlatList,
+    TouchableOpacity,
+    StyleSheet,
+    StatusBar
+} from 'react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+/* ---------------------------
+   Dummy Chat Data
+----------------------------*/
+const chats = [
+    { id: '1', name: 'Ravi' },
+    { id: '2', name: 'Anita' },
+    { id: '3', name: 'John' },
+    { id: '4', name: 'Meena' },
+];
+
+/* ---------------------------
+   Chat List Screen
+----------------------------*/
+function ChatListScreen({ navigation }) {
+    return (
+        <View style={{ flex: 1 }}>
+            <FlatList
+                data={chats}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={styles.chatItem}
+                        onPress={() =>
+                            navigation.navigate('ChatScreen', {
+                                name: item.name,
+                            })
+                        }
+                    >
+                        <Text style={styles.chatName}>{item.name}</Text>
+                        <Text style={styles.chatMsg}>Last message...</Text>
+                    </TouchableOpacity>
+                )}
+            />
+
+            {/* Floating Button */}
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() => navigation.navigate('NewChat')}
+            >
+                <Text style={{ color: 'white', fontSize: 28 }}>+</Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+
+/* ---------------------------
+   Chat Screen
+----------------------------*/
+function ChatScreen({ route }) {
+    return (
+        <View style={styles.center}>
+            <Text style={styles.title}>
+                Chat with {route.params.name}
+            </Text>
+        </View>
+    );
+}
+
+/* ---------------------------
+   New Chat Screen
+----------------------------*/
+function NewChatScreen() {
+    return (
+        <View style={styles.center}>
+            <Text style={styles.title}>Start New Chat</Text>
+        </View>
+    );
+}
+
+/* ---------------------------
+   Status Screen
+----------------------------*/
+function StatusScreen() {
+    return (
+        <View style={styles.center}>
+            <Text style={styles.title}>Status Screen</Text>
+        </View>
+    );
+}
+
+/* ---------------------------
+   Calls Screen
+----------------------------*/
+function CallsScreen() {
+    return (
+        <View style={styles.center}>
+            <Text style={styles.title}>Calls Screen</Text>
+        </View>
+    );
+}
+
+/* ---------------------------
+   Navigators
+----------------------------*/
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+/* Chat Stack */
+function ChatStack() {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen
+                name="ChatList"
+                component={ChatListScreen}
+                options={{ title: 'My chats' }}
+            />
+            <Stack.Screen
+                name="ChatScreen"
+                component={ChatScreen}
+                options={({ route }) => ({
+                    title: route.params.name,
+                })}
+            />
+            <Stack.Screen
+                name="NewChat"
+                component={NewChatScreen}
+                options={{ title: 'New Chat' }}
+            />
+        </Stack.Navigator>
+    );
+}
+
+/* Bottom Tabs */
+function Tabs() {
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarIcon: ({ color, size, focused }) => {
+                    let iconName;
+                    if (route.name === 'Chats') {
+                        iconName = focused
+                            ? 'chatbubble'
+                            : 'chatbubble-outline';
+                    } else if (route.name === 'Status') {
+                        iconName = focused
+                            ? 'ellipse'
+                            : 'ellipse-outline';
+                    } else if (route.name === 'Calls') {
+                        iconName = focused
+                            ? 'call'
+                            : 'call-outline';
+                    }
+
+                    return (
+                        <Ionicons
+                            name={iconName}
+                            size={size}
+                            color={color}
+                        />
+                    );
+                },
+                tabBarLabelStyle: {
+                    fontSize: 14,
+                    fontFamily: 'Georgia',
+                    fontWeight: 'bold',
+                },
+                tabBarBadgeStyle: {
+                    color: 'black',
+                    backgroundColor: 'yellow',
+                },
+                animation: 'fade',
+                tabBarActiveTintColor: '#25d36a',
+                tabBarInactiveTintColor: 'red',
+            })}
+        >
+            <Tab.Screen name="Chats" option component={ChatStack} />
+            <Tab.Screen name="Status" component={StatusScreen} />
+            <Tab.Screen name="Calls" component={CallsScreen} />
+        </Tab.Navigator>
+    );
+}
+
+/* Root App */
+export default function App() {
+    return (
+        <NavigationContainer>
+            <StatusBar
+                barStyle="dark-content"
+                backgroundColor="#e8c4c4"
+            />
+            <Tabs />
+        </NavigationContainer>
+    );
+}
+
+/* ---------------------------
+   Styles
+----------------------------*/
+const styles = StyleSheet.create({
+    center: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+
+    chatItem: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+
+    chatName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+
+    chatMsg: {
+        color: '#666',
+        marginTop: 4,
+    },
+
+    fab: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#25D366',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 6,
+    },
+});
