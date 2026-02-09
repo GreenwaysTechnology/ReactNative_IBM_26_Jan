@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     View,
     Text,
@@ -11,8 +10,6 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 /* ---------------------------
    Dummy Chat Data
@@ -49,12 +46,9 @@ function ChatListScreen({ navigation }) {
             />
 
             {/* Floating Button */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => navigation.navigate('NewChat')}
-            >
-                <Text style={{ color: 'white', fontSize: 28 }}>+</Text>
-            </TouchableOpacity>
+            <View style={styles.fab}>
+                <Text style={{ color: 'white', fontSize: 24 }}>+</Text>
+            </View>
         </View>
     );
 }
@@ -68,17 +62,6 @@ function ChatScreen({ route }) {
             <Text style={styles.title}>
                 Chat with {route.params.name}
             </Text>
-        </View>
-    );
-}
-
-/* ---------------------------
-   New Chat Screen
-----------------------------*/
-function NewChatScreen() {
-    return (
-        <View style={styles.center}>
-            <Text style={styles.title}>Start New Chat</Text>
         </View>
     );
 }
@@ -118,7 +101,7 @@ function ChatStack() {
             <Stack.Screen
                 name="ChatList"
                 component={ChatListScreen}
-                options={{ title: 'My chats' }}
+                options={{ title: 'Chats' }}
             />
             <Stack.Screen
                 name="ChatScreen"
@@ -126,11 +109,6 @@ function ChatStack() {
                 options={({ route }) => ({
                     title: route.params.name,
                 })}
-            />
-            <Stack.Screen
-                name="NewChat"
-                component={NewChatScreen}
-                options={{ title: 'New Chat' }}
             />
         </Stack.Navigator>
     );
@@ -140,47 +118,11 @@ function ChatStack() {
 function Tabs() {
     return (
         <Tab.Navigator
-            screenOptions={({ route }) => ({
-                headerShown: false,
-                tabBarIcon: ({ color, size, focused }) => {
-                    let iconName;
-                    if (route.name === 'Chats') {
-                        iconName = focused
-                            ? 'chatbubble'
-                            : 'chatbubble-outline';
-                    } else if (route.name === 'Status') {
-                        iconName = focused
-                            ? 'ellipse'
-                            : 'ellipse-outline';
-                    } else if (route.name === 'Calls') {
-                        iconName = focused
-                            ? 'call'
-                            : 'call-outline';
-                    }
-
-                    return (
-                        <Ionicons
-                            name={iconName}
-                            size={size}
-                            color={color}
-                        />
-                    );
-                },
-                tabBarLabelStyle: {
-                    fontSize: 14,
-                    fontFamily: 'Georgia',
-                    fontWeight: 'bold',
-                },
-                tabBarBadgeStyle: {
-                    color: 'black',
-                    backgroundColor: 'yellow',
-                },
-                animation: 'fade',
-                tabBarActiveTintColor: '#25d36a',
-                tabBarInactiveTintColor: 'red',
-            })}
+            screenOptions={{
+                headerShown: false, // ✅ hides duplicate header
+            }}
         >
-            <Tab.Screen name="Chats" option component={ChatStack} />
+            <Tab.Screen name="Chats" component={ChatStack} />
             <Tab.Screen name="Status" component={StatusScreen} />
             <Tab.Screen name="Calls" component={CallsScreen} />
         </Tab.Navigator>
@@ -193,7 +135,7 @@ export default function App() {
         <NavigationContainer>
             <StatusBar
                 barStyle="dark-content"
-                backgroundColor="#e8c4c4"
+                backgroundColor="#ffffff"
             />
             <Tabs />
         </NavigationContainer>
@@ -236,11 +178,11 @@ const styles = StyleSheet.create({
         bottom: 20,
         right: 20,
         backgroundColor: '#25D366',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 6,
+        elevation: 5,
     },
 });

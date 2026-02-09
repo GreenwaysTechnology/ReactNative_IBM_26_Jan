@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     View,
     Text,
@@ -49,12 +48,9 @@ function ChatListScreen({ navigation }) {
             />
 
             {/* Floating Button */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => navigation.navigate('NewChat')}
-            >
-                <Text style={{ color: 'white', fontSize: 28 }}>+</Text>
-            </TouchableOpacity>
+            <View style={styles.fab}>
+                <Text style={{ color: 'white', fontSize: 24 }}>+</Text>
+            </View>
         </View>
     );
 }
@@ -68,17 +64,6 @@ function ChatScreen({ route }) {
             <Text style={styles.title}>
                 Chat with {route.params.name}
             </Text>
-        </View>
-    );
-}
-
-/* ---------------------------
-   New Chat Screen
-----------------------------*/
-function NewChatScreen() {
-    return (
-        <View style={styles.center}>
-            <Text style={styles.title}>Start New Chat</Text>
         </View>
     );
 }
@@ -118,7 +103,7 @@ function ChatStack() {
             <Stack.Screen
                 name="ChatList"
                 component={ChatListScreen}
-                options={{ title: 'My chats' }}
+                options={{ title: 'Chats' }}
             />
             <Stack.Screen
                 name="ChatScreen"
@@ -126,11 +111,6 @@ function ChatStack() {
                 options={({ route }) => ({
                     title: route.params.name,
                 })}
-            />
-            <Stack.Screen
-                name="NewChat"
-                component={NewChatScreen}
-                options={{ title: 'New Chat' }}
             />
         </Stack.Navigator>
     );
@@ -142,20 +122,15 @@ function Tabs() {
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
-                tabBarIcon: ({ color, size, focused }) => {
+                tabBarIcon: ({ color, size }) => {
                     let iconName;
+
                     if (route.name === 'Chats') {
-                        iconName = focused
-                            ? 'chatbubble'
-                            : 'chatbubble-outline';
+                        iconName = 'chatbubble-outline';
                     } else if (route.name === 'Status') {
-                        iconName = focused
-                            ? 'ellipse'
-                            : 'ellipse-outline';
+                        iconName = 'ellipse-outline';
                     } else if (route.name === 'Calls') {
-                        iconName = focused
-                            ? 'call'
-                            : 'call-outline';
+                        iconName = 'call-outline';
                     }
 
                     return (
@@ -166,21 +141,11 @@ function Tabs() {
                         />
                     );
                 },
-                tabBarLabelStyle: {
-                    fontSize: 14,
-                    fontFamily: 'Georgia',
-                    fontWeight: 'bold',
-                },
-                tabBarBadgeStyle: {
-                    color: 'black',
-                    backgroundColor: 'yellow',
-                },
-                animation: 'fade',
-                tabBarActiveTintColor: '#25d36a',
-                tabBarInactiveTintColor: 'red',
+                tabBarActiveTintColor: '#25D366',
+                tabBarInactiveTintColor: 'gray',
             })}
         >
-            <Tab.Screen name="Chats" option component={ChatStack} />
+            <Tab.Screen name="Chats" component={ChatStack} />
             <Tab.Screen name="Status" component={StatusScreen} />
             <Tab.Screen name="Calls" component={CallsScreen} />
         </Tab.Navigator>
@@ -236,11 +201,11 @@ const styles = StyleSheet.create({
         bottom: 20,
         right: 20,
         backgroundColor: '#25D366',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 6,
+        elevation: 5,
     },
 });
