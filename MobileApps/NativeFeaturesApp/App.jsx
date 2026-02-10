@@ -1,61 +1,52 @@
-import { StatusBar, Text, View, StyleSheet, Platform, PermissionsAndroid, Button } from "react-native"
+import { StatusBar, Text, View, StyleSheet, Alert, Platform, PermissionsAndroid, Button } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
-import MapView, { Marker } from 'react-native-maps';
-import Geolocation from '@react-native-community/geolocation';
+import { Camera, useCameraDevice, useCameraDevices } from "react-native-vision-camera";
 
-function MyLocation() {
-    const [location, setLocation] = useState(null);
-    const mapRef = useRef(null);
+function MyCamera() {
+    const device = useCameraDevice('back')
+    const devices = useCameraDevices()
 
     useEffect(() => {
-        const watchId = Geolocation.watchPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
+        console.log('Available devices:', devices);
+    }, [device]);
 
-                const region = {
-                    latitude,
-                    longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                };
+    useEffect(() => {
+        const requestPermission = async () => {
+            const cameraPermission = await Camera.requestCameraPermission();
+            const microphonePermission = await Camera.requestMicrophonePermission();
 
-                setLocation(region);
-
-                // Move camera smoothly
-                mapRef.current?.animateToRegion(region, 1000);
-            },
-            error => console.log(error),
-            {
-                enableHighAccuracy: true,
-                distanceFilter: 5,
-                interval: 3000,
+            if (cameraPermission !== 'authorized' || microphonePermission !== 'authorized') {
+                Alert.alert('Permission denied', 'Camera or Microphone permission is required.');
             }
-        );
+        };
 
-        return () => Geolocation.clearWatch(watchId);
+        requestPermission();
     }, []);
+
+    if (device == null) {
+        return <Text>Loading camera...</Text>;
+    }
 
     return (
         <View style={styles.container}>
-            <MapView
-                ref={mapRef}
-                style={styles.map}
-                showsUserLocation
-                followsUserLocation
-            >
-                {location && (
-                    <Marker coordinate={location} />
-                )}
-            </MapView>
+            <Camera
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={true}
+            />
+            <View style={styles.buttonContainer}>
+                <Button title="Capture" onPress={() => Alert.alert('Feature not implemented')} />
+            </View>
         </View>
     );
+
 }
 
 function App() {
     return <SafeAreaProvider>
         <StatusBar barStyle="dark-content" />
-        <MyLocation />
+        <MyCamera />
     </SafeAreaProvider>
 }
 
@@ -64,5 +55,12 @@ export default App
 //define Style
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    map: { flex: 1 },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 20,
+        alignSelf: 'center',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 10,
+    },
 });
